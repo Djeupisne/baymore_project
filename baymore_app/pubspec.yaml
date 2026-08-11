@@ -1,0 +1,69 @@
+name: baymore
+description: "Baymore — boutique en ligne d'accessoires femme, homme, enfant."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # Backend maison (Node.js/Express sur Render) — voir baymore_backend/
+  dio: ^5.7.0
+  socket_io_client: ^2.0.3+1
+  flutter_secure_storage: ^9.2.2
+
+  # Notifications push
+  onesignal_flutter: ^5.2.4
+
+  # State management
+  provider: ^6.1.2
+
+  # UI / UX
+  google_fonts: ^6.2.1
+  cached_network_image: ^3.3.1
+  shimmer: ^3.0.0
+  flutter_svg: ^2.0.10+1
+  smooth_page_indicator: ^1.1.0
+
+  # Utilitaires
+  shared_preferences: ^2.2.3
+  share_plus: ^9.0.0
+  package_info_plus: ^8.0.0
+  intl: ^0.19.0
+  image_picker: ^1.1.2
+  url_launcher: ^6.3.0
+  uuid: ^4.4.0
+  connectivity_plus: ^6.0.3
+
+  # Carte / suivi livreur en temps réel (optionnel, activer avec une clé Google Maps)
+  google_maps_flutter: ^2.6.1
+  geolocator: ^12.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.1
+
+# Génère automatiquement l'icône dans toutes les tailles requises par
+# Android et iOS à partir d'un seul fichier source. Placez votre icône
+# définitive (carrée, min. 1024x1024px, sans coins arrondis — le système
+# les applique lui-même) dans assets/icons/app_icon.png puis lancez :
+#   flutter pub run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: "assets/icons/app_icon.png"
+  min_sdk_android: 21
+  adaptive_icon_background: "#16151C"
+  adaptive_icon_foreground: "assets/icons/app_icon.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/

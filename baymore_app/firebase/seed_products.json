@@ -1,0 +1,63 @@
+[
+  {
+    "name": "Sac besace cuir camel",
+    "category": "femme",
+    "subCategory": "sacs",
+    "price": 18500,
+    "images": ["https://images.unsplash.com/photo-1590874103328-eac38a683ce7"],
+    "description": "Sac besace en cuir véritable, doublure intérieure et bandoulière réglable.",
+    "sizes": [],
+    "colors": ["Camel", "Noir"],
+    "rating": 4.8,
+    "ratingCount": 32,
+    "stock": 14,
+    "isNew": true,
+    "isPromo": false
+  },
+  {
+    "name": "Derbies cuir noir",
+    "category": "homme",
+    "subCategory": "chaussures",
+    "price": 24000,
+    "images": ["https://images.unsplash.com/photo-1614252369475-531eba835eb1"],
+    "description": "Derbies en cuir lisse, semelle confort, parfaites pour le bureau comme les sorties.",
+    "sizes": ["40", "41", "42", "43", "44"],
+    "colors": ["Noir"],
+    "rating": 4.6,
+    "ratingCount": 21,
+    "stock": 9,
+    "isNew": false,
+    "isPromo": false
+  },
+  {
+    "name": "Ensemble coton 4-6 ans",
+    "category": "enfant",
+    "subCategory": "habits",
+    "price": 7900,
+    "images": ["https://images.unsplash.com/photo-1519238263530-99bdd11df2ea"],
+    "description": "Ensemble deux pièces en coton doux, idéal pour le quotidien.",
+    "sizes": ["4 ans", "5 ans", "6 ans"],
+    "colors": ["Beige", "Bleu ciel"],
+    "rating": 4.9,
+    "ratingCount": 18,
+    "stock": 25,
+    "isNew": false,
+    "isPromo": true,
+    "oldPrice": 9500
+  },
+  {
+    "name": "Coffret soin visage",
+    "category": "beaute",
+    "subCategory": "cosmetiques",
+    "price": 12300,
+    "images": ["https://images.unsplash.com/photo-1571781926291-c477ebfd024b"],
+    "description": "Coffret de trois soins visage adaptés aux peaux normales à sèches.",
+    "sizes": [],
+    "colors": [],
+    "rating": 4.7,
+    "ratingCount": 40,
+    "stock": 30,
+    "isNew": false,
+    "isPromo": false
+  }
+]

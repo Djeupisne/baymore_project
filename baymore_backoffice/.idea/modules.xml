@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/baymore_backoffice.iml" filepath="$PROJECT_DIR$/baymore_backoffice.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/baymore_backoffice_android.iml" filepath="$PROJECT_DIR$/android/baymore_backoffice_android.iml" />
+    </modules>
+  </component>
+</project>

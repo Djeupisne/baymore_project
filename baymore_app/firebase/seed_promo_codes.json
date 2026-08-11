@@ -1,0 +1,17 @@
+{
+  "BIENVENUE10": {
+    "type": "percent",
+    "value": 10,
+    "maxDiscount": 3000,
+    "minOrder": 5000,
+    "active": true,
+    "description": "10% de réduction pour les nouveaux clients (max 3000 F)"
+  },
+  "LIVRAISON0": {
+    "type": "fixed",
+    "value": 1500,
+    "minOrder": 10000,
+    "active": true,
+    "description": "Livraison offerte dès 10 000 F d'achat"
+  }
+}

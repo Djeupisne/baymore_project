@@ -1,0 +1,199 @@
+// Schéma Baymore — PostgreSQL via Prisma.
+// Un seul modèle User avec un champ `role` (CUSTOMER / STAFF) : un client
+// et un membre de l'équipe se connectent avec le même système d'auth,
+// seul le rôle change ce qu'ils peuvent faire (voir middleware/auth.js).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  CUSTOMER
+  STAFF
+}
+
+enum DeliveryMode {
+  DOMICILE
+  RETRAIT
+}
+
+enum OrderStatusEnum {
+  EN_ATTENTE
+  PRIS_EN_CHARGE
+  EN_ROUTE
+  LIVRE
+  ANNULE
+}
+
+enum PaymentStatusEnum {
+  NON_REQUIS
+  EN_ATTENTE
+  PAYE
+  ECHOUE
+}
+
+enum ReturnStatusEnum {
+  EN_ATTENTE
+  APPROUVE
+  REFUSE
+  REMBOURSE
+}
+
+enum PromoType {
+  PERCENT
+  FIXED
+}
+
+model User {
+  id            String    @id @default(uuid())
+  role          Role      @default(CUSTOMER)
+  name          String
+  email         String    @unique
+  passwordHash  String
+  phone         String    @default("")
+  loyaltyPoints Int       @default(0)
+  walletBalance Int       @default(0)
+  referralCode  String    @unique
+  referredBy    String?
+  favoriteProductIds String[] @default([])
+  createdAt     DateTime  @default(now())
+
+  addresses          Address[]
+  orders             Order[]
+  reviews            Review[]
+  returnRequests     ReturnRequest[]
+  stockAlerts        StockAlert[]
+  walletTransactions WalletTransaction[]
+}
+
+model Address {
+  id          String  @id @default(uuid())
+  userId      String
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label       String
+  fullAddress String
+  latitude    Float?
+  longitude   Float?
+  isDefault   Boolean @default(false)
+
+  @@index([userId])
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  category    String   // femme, homme, enfant, beaute
+  subCategory String   // sacs, chaussures, habits, cosmetiques...
+  price       Int
+  oldPrice    Int?
+  images      String[]
+  description String   @default("")
+  sizes       String[]
+  colors      String[]
+  rating      Float    @default(0)
+  ratingCount Int      @default(0)
+  stock       Int      @default(0)
+  isNew       Boolean  @default(false)
+  isPromo     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+
+  reviews     Review[]
+  stockAlerts StockAlert[]
+
+  @@index([category])
+}
+
+model Review {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userName  String
+  rating    Float
+  comment   String   @default("")
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+}
+
+model Order {
+  id                   String            @id @default(uuid())
+  userId               String
+  user                 User              @relation(fields: [userId], references: [id])
+  items                Json              // [{productId,name,image,price,size,color,quantity}]
+  subtotal             Int
+  deliveryFee          Int
+  discount             Int               @default(0)
+  promoCode            String?
+  total                Int
+  deliveryMode         DeliveryMode
+  deliveryAddress      String
+  paymentMethod        String            // especes, flooz, tmoney
+  paymentStatus        PaymentStatusEnum @default(NON_REQUIS)
+  paymentTransactionId String?
+  status               OrderStatusEnum   @default(EN_ATTENTE)
+  statusHistory        Json              @default("[]")
+  driverName           String?
+  driverPhone          String?
+  driverLat            Float?
+  driverLng            Float?
+  createdAt            DateTime          @default(now())
+
+  returnRequests ReturnRequest[]
+
+  @@index([userId])
+  @@index([status])
+}
+
+model ReturnRequest {
+  id        String           @id @default(uuid())
+  orderId   String
+  order     Order            @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userName  String
+  reason    String
+  status    ReturnStatusEnum @default(EN_ATTENTE)
+  staffNote String?
+  createdAt DateTime         @default(now())
+}
+
+model PromoCode {
+  code        String    @id
+  type        PromoType
+  value       Int
+  maxDiscount Int?
+  minOrder    Int?
+  active      Boolean   @default(true)
+  expiresAt   DateTime?
+  description String    @default("")
+  createdAt   DateTime  @default(now())
+}
+
+model StockAlert {
+  id        String   @id @default(uuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([productId, userId])
+}
+
+model WalletTransaction {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int
+  reason    String
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+}

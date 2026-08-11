@@ -1,0 +1,104 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isStaff() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/staff/$(request.auth.uid));
+    }
+
+    // Comptes autorisés du back-office (boutique / livreurs). Un document
+    // staff/{uid} = { name, role } est créé manuellement dans la console
+    // Firebase pour chaque membre de l'équipe — voir README back-office.
+    // Un membre du staff peut mettre à jour SON SEUL champ fcmToken (pour
+    // recevoir les notifications de nouvelle commande) — tout le reste
+    // (nom, rôle, existence du compte) reste géré manuellement.
+    match /staff/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow update: if request.auth != null && request.auth.uid == uid &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['fcmToken']);
+      allow create, delete: if false; // géré manuellement depuis la console Firebase
+    }
+
+    // Profils utilisateurs : chacun lit/modifie uniquement le sien.
+    // Le staff peut lire les profils pour préparer les livraisons.
+    match /users/{userId} {
+      allow read: if request.auth != null && (request.auth.uid == userId || isStaff());
+      allow create: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId;
+
+      // Carnet d'adresses du client — lui seul y a accès.
+      match /addresses/{addressId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // Historique du portefeuille (cashback) — lecture seule pour le
+      // client, écriture réservée aux Cloud Functions (admin SDK, qui
+      // contourne ces règles).
+      match /walletTransactions/{transactionId} {
+        allow read: if request.auth != null && request.auth.uid == userId;
+        allow write: if false;
+      }
+    }
+
+    // Catalogue produits : lecture publique, écriture réservée au staff
+    // (back-office).
+    match /products/{productId} {
+      allow read: if true;
+      allow write: if isStaff();
+    }
+
+    // Avis clients : lecture publique, dépôt réservé aux clients connectés
+    // (un seul avis par commentaire, pas de modification a posteriori pour
+    // préserver l'authenticité des avis).
+    match /reviews/{reviewId} {
+      allow read: if true;
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow update, delete: if isStaff();
+    }
+
+    // Alertes de retour en stock : chaque client gère uniquement les
+    // siennes (elles sont de toute façon supprimées automatiquement par
+    // la Cloud Function `onProductRestocked` une fois la notification envoyée).
+    match /stockAlerts/{alertId} {
+      allow get: if request.auth != null && request.auth.uid == resource.data.userId;
+      allow create, update: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow delete: if request.auth != null && request.auth.uid == resource.data.userId;
+    }
+
+    // Codes promo : jamais lisibles directement par le client — la
+    // validation passe uniquement par la Cloud Function `validatePromoCode`
+    // pour empêcher toute triche sur le montant de la remise. Écriture
+    // réservée au staff (création des campagnes promo).
+    match /promoCodes/{code} {
+      allow read: if false;
+      allow write: if isStaff();
+    }
+
+    // Demandes de retour / remboursement : le client crée et lit ses
+    // propres demandes ; seul le staff peut les faire évoluer (approuver,
+    // refuser, marquer remboursé).
+    match /returnRequests/{requestId} {
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read: if request.auth != null && (request.auth.uid == resource.data.userId || isStaff());
+      allow update: if isStaff();
+    }
+
+    // Commandes : le client crée et lit ses propres commandes. Seul le
+    // staff peut faire avancer le statut (pris_en_charge / en_route / livre)
+    // et renseigner la position du livreur.
+    match /orders/{orderId} {
+      allow create: if request.auth != null && request.auth.uid == request.resource.data.userId;
+      allow read: if request.auth != null && (request.auth.uid == resource.data.userId || isStaff());
+      // Le staff peut tout modifier. Le client, lui, peut uniquement annuler
+      // SA commande, et seulement tant qu'elle n'a pas encore été prise en
+      // charge par la boutique (aucun autre champ ne peut être modifié).
+      allow update: if isStaff() ||
+        (request.auth != null &&
+         request.auth.uid == resource.data.userId &&
+         resource.data.status == 'en_attente' &&
+         request.resource.data.status == 'annule' &&
+         request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'statusHistory']));
+    }
+  }
+}

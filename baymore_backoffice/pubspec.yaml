@@ -1,0 +1,37 @@
+name: baymore_backoffice
+description: "Back-office Baymore — gestion des commandes, livraisons et catalogue."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.6
+
+  # Backend maison (Node.js/Express sur Render) — voir baymore_backend/
+  dio: ^5.7.0
+  socket_io_client: ^2.0.3+1
+  flutter_secure_storage: ^9.2.2
+
+  # Notifications push
+  onesignal_flutter: ^5.2.4
+
+  provider: ^6.1.2
+  google_fonts: ^6.2.1
+  intl: ^0.19.0
+  cached_network_image: ^3.3.1
+  fl_chart: ^0.68.0
+  url_launcher: ^6.3.0
+  geolocator: ^12.0.0
+  image_picker: ^1.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
