@@ -30,8 +30,16 @@ const io = new Server(server, {
 });
 initSocket(io);
 
+// Configuration CORS explicite pour gérer les requêtes cross-origin
+const corsOptions = {
+  origin: true, // Accepte toutes les origines (à restreindre en production)
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+app.use(cors(corsOptions));
 app.use(helmet());
-app.use(cors());
 app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 
 // Le webhook CinetPay envoie du x-www-form-urlencoded — on l'accepte aussi.
