@@ -46,6 +46,10 @@ class AuthProvider extends ChangeNotifier {
   void _bindWalletListener() {
     if (_walletListenerBound) return;
     _walletListenerBound = true;
+    
+    // Rejoindre la room des clients pour recevoir les notifications de promos et catalogues
+    SocketService().joinCustomerRoom();
+    
     SocketService().socket.on('order:update', (data) {
       try {
         final map = Map<String, dynamic>.from(data);

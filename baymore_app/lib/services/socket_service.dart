@@ -22,4 +22,22 @@ class SocketService {
   void watchOrder(String orderId) => socket.emit('order:watch', orderId);
   void unwatchOrder(String orderId) => socket.emit('order:unwatch', orderId);
   void joinStaffRoom() => socket.emit('staff:join');
+  
+  /// Rejoindre la room des clients pour recevoir les notifications de promos et catalogues
+  void joinCustomerRoom() => socket.emit('customer:join');
+  void leaveCustomerRoom() => socket.emit('customer:leave');
+  
+  /// Écouter les notifications de promotions/codes promo
+  void onPromoNotification(void Function(Map<String, dynamic>) callback) {
+    socket.on('promo:notification', (data) => callback(data));
+  }
+  
+  /// Écouter les notifications de nouveaux catalogues
+  void onCatalogNotification(void Function(Map<String, dynamic>) callback) {
+    socket.on('catalog:notification', (data) => callback(data));
+  }
+  
+  /// Supprimer les écouteurs
+  void offPromoNotification() => socket.off('promo:notification');
+  void offCatalogNotification() => socket.off('catalog:notification');
 }
