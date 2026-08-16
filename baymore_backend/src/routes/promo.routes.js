@@ -75,7 +75,7 @@ router.post('/', requireAuth, requireStaff, async (req, res) => {
   });
 
   // Notification push quand une nouvelle promotion est créée
-  const allCustomers = await prisma.user.findMany({ where: { role: 'CLIENT' }, select: { id: true } });
+  const allCustomers = await prisma.user.findMany({ where: { role: 'CUSTOMER' }, select: { id: true } });
   const promoLabel = type === 'PERCENT' ? `-${value}%` : `-${value} F CFA`;
   await sendPushToUsers(allCustomers.map((c) => c.id), {
     title: 'Baymore — Nouvelle Promotion',
@@ -105,7 +105,7 @@ router.put('/:code', requireAuth, requireStaff, async (req, res) => {
 
   // Notification push quand une nouvelle promotion est créée ou activée
   if (!before || (!before.active && promo.active)) {
-    const allCustomers = await prisma.user.findMany({ where: { role: 'CLIENT' }, select: { id: true } });
+    const allCustomers = await prisma.user.findMany({ where: { role: 'CUSTOMER' }, select: { id: true } });
     const promoLabel = type === 'PERCENT' ? `-${value}%` : `-${value} F CFA`;
     await sendPushToUsers(allCustomers.map((c) => c.id), {
       title: 'Baymore — Nouvelle Promotion',
@@ -126,7 +126,7 @@ router.patch('/:code/active', requireAuth, requireStaff, async (req, res) => {
 
   // Notification quand une promo est réactivée
   if (!before?.active && promo.active) {
-    const allCustomers = await prisma.user.findMany({ where: { role: 'CLIENT' }, select: { id: true } });
+    const allCustomers = await prisma.user.findMany({ where: { role: 'CUSTOMER' }, select: { id: true } });
     await sendPushToUsers(allCustomers.map((c) => c.id), {
       title: 'Baymore — Promotion disponible',
       body: `Le code ${promo.code} est de nouveau actif !`,
