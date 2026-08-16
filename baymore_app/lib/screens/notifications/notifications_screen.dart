@@ -113,7 +113,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               actions: [
                 TextButton(
                   onPressed: () => Navigator.pop(context),
-                  child: Text(AppStrings.of(context).t('close')),
+                  child: Text(AppStrings.of(context).close),
                 ),
               ],
             ),
@@ -128,7 +128,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   String _getNotificationTitle(AppNotification n, AppStrings strings) {
     switch (n.type) {
       case NotificationType.orderStatus:
-        return n.title;
+        return strings.t('orderStatusNotification');
       case NotificationType.promotion:
         return strings.t('promotionNotification');
       case NotificationType.newProduct:
