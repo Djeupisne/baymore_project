@@ -212,9 +212,9 @@ class NotificationService {
     return list.where((n) => !n.read).length;
   }
 
-  /// Méthode interne pour enregistrer une notification de statut de commande
+  /// Méthode pour enregistrer une notification de statut de commande
   /// Appelée par AuthProvider quand une commande change de statut
-  Future<void> _storeFromAuthProvider({
+  Future<void> storeOrderStatus({
     required String title,
     required String body,
     required NotificationType type,
