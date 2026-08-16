@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../config/api_config.dart';
@@ -176,6 +177,21 @@ class NotificationService {
     final list = await _readAll(prefs);
     for (final n in list) {
       n.read = true;
+    }
+    await prefs.setString(_storageKey, jsonEncode(list.map((n) => n.toJson()).toList()));
+    for (final cb in _listeners) {
+      cb();
+    }
+  }
+
+  Future<void> markAsRead(String id) async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = await _readAll(prefs);
+    for (final n in list) {
+      if (n.id == id) {
+        n.read = true;
+        break;
+      }
     }
     await prefs.setString(_storageKey, jsonEncode(list.map((n) => n.toJson()).toList()));
     for (final cb in _listeners) {

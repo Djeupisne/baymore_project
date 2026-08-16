@@ -23,7 +23,7 @@ class _LoyaltyScreenState extends State<LoyaltyScreen> {
     setState(() => _converting = true);
     try {
       final client = ApiClient();
-      await client.post('/loyalty/convert', {'points': profile.loyaltyPoints});
+      await client.post('/loyalty/convert', data: {'points': profile.loyaltyPoints});
       await auth.refreshProfile();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
