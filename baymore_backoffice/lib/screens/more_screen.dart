@@ -5,6 +5,7 @@ import 'promo_codes_screen.dart';
 import 'returns_screen.dart';
 import 'reviews_screen.dart';
 import 'contact_screen.dart';
+import 'catalogs_screen.dart';
 
 class MoreScreen extends StatelessWidget {
   const MoreScreen({super.key});
@@ -14,7 +15,8 @@ class MoreScreen extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.all(16),
       children: [
-        _tile(context, Icons.inventory_2_outlined, 'Catalogue', 'Créer et modifier vos articles', const ProductsScreen()),
+        _tile(context, Icons.collections_bookmark_outlined, 'Catalogues', 'Créer et gérer vos collections', const CatalogsScreen()),
+        _tile(context, Icons.inventory_2_outlined, 'Articles', 'Créer et modifier vos articles', const ProductsScreen()),
         _tile(context, Icons.confirmation_number_outlined, 'Codes promo', 'Créer et gérer vos offres', const PromoCodesScreen()),
         _tile(context, Icons.assignment_return_outlined, 'Retours & remboursements', 'Traiter les demandes des clients', const ReturnsScreen()),
         _tile(context, Icons.reviews_outlined, 'Avis clients', 'Modérer les avis publiés', const ReviewsScreen()),
