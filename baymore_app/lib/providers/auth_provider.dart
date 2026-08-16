@@ -61,6 +61,66 @@ class AuthProvider extends ChangeNotifier {
         }
       } catch (_) {}
     });
+
+    // Écouter les notifications de codes promo (création, activation, désactivation)
+    SocketService().socket.on('promo:notification', (data) {
+      try {
+        final map = Map<String, dynamic>.from(data);
+        final type = map['type'] as String?;
+        final title = map['title'] as String? ?? 'Baymore';
+        final body = map['body'] as String? ?? '';
+        final promoId = map['promoId'] as String?;
+        final promoCode = map['promoCode'] as String?;
+        
+        if (type == null || body.isEmpty) return;
+        
+        NotificationType notificationType;
+        switch (type) {
+          case 'promotion':
+            notificationType = NotificationType.promotion;
+            break;
+          case 'promo_disabled':
+            notificationType = NotificationType.promoDisabled;
+            break;
+          default:
+            notificationType = NotificationType.promotion;
+        }
+        
+        // Afficher la notification système
+        LocalNotificationService().show(title, body);
+        
+        // Enregistrer dans l'historique
+        NotificationService().storePromoNotification(
+          title: title,
+          body: body,
+          type: notificationType,
+          promoId: promoId,
+          promoCode: promoCode,
+        );
+      } catch (_) {}
+    });
+
+    // Écouter les notifications de nouveaux catalogues
+    SocketService().socket.on('catalog:notification', (data) {
+      try {
+        final map = Map<String, dynamic>.from(data);
+        final title = map['title'] as String? ?? 'Baymore';
+        final body = map['body'] as String? ?? '';
+        final catalogId = map['catalogId'] as String?;
+        
+        if (body.isEmpty) return;
+        
+        // Afficher la notification système
+        LocalNotificationService().show(title, body);
+        
+        // Enregistrer dans l'historique
+        NotificationService().storeCatalogNotification(
+          title: title,
+          body: body,
+          catalogId: catalogId,
+        );
+      } catch (_) {}
+    });
   }
 
   Future<void> _notifyStatusChange(String statusStr, String? orderId) async {
