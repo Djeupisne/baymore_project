@@ -83,11 +83,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         }
         break;
       case NotificationType.promotion:
+      case NotificationType.promoDisabled:
       case NotificationType.newProduct:
       case NotificationType.restock:
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Navigation vers le produit...')),
+            const SnackBar(content: Text('Navigation vers les promotions...')),
+          );
+        }
+        break;
+      case NotificationType.catalog:
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Navigation vers le catalogue...')),
           );
         }
         break;
@@ -131,6 +139,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return strings.t('orderStatusNotification');
       case NotificationType.promotion:
         return strings.t('promotionNotification');
+      case NotificationType.promoDisabled:
+        return strings.t('promoDisabledNotification');
       case NotificationType.newProduct:
         return strings.t('newProductNotification');
       case NotificationType.restock:
@@ -139,6 +149,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return strings.t('newOrderNotification');
       case NotificationType.message:
         return strings.t('messageNotification');
+      case NotificationType.catalog:
+        return strings.t('catalogNotification');
       case NotificationType.unknown:
         return n.title;
     }
@@ -150,6 +162,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return Icons.local_shipping_outlined;
       case NotificationType.promotion:
         return Icons.local_offer_outlined;
+      case NotificationType.promoDisabled:
+        return Icons.local_offer_outlined;
       case NotificationType.newProduct:
         return Icons.new_releases_outlined;
       case NotificationType.restock:
@@ -158,6 +172,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return Icons.shopping_bag_outlined;
       case NotificationType.message:
         return Icons.chat_bubble_outline;
+      case NotificationType.catalog:
+        return Icons.book_outlined;
       case NotificationType.unknown:
         return Icons.notifications_none_rounded;
     }
@@ -169,6 +185,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return AppColors.ink;
       case NotificationType.promotion:
         return AppColors.goldDeep;
+      case NotificationType.promoDisabled:
+        return AppColors.muted;
       case NotificationType.newProduct:
         return AppColors.rose;
       case NotificationType.restock:
@@ -177,6 +195,8 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         return AppColors.plum;
       case NotificationType.message:
         return AppColors.muted;
+      case NotificationType.catalog:
+        return AppColors.sand;
       case NotificationType.unknown:
         return AppColors.muted;
     }

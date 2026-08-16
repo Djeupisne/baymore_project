@@ -1,20 +1,42 @@
 ```
+# Flutter/Dart specific
+.dart_tool/
+.packages
+pubspec.lock
+
+# Build outputs
+build/
+dist/
+
 # Dependencies
+vendor/
 node_modules/
 
-# Logs and temp files
+# Logs
 *.log
-*.tmp
+**/logs
 
-# Environment
+# Environment variables
 .env
 .env.local
 .env.*
+!.env.example
 
-# Editors
+# IDE files
 .vscode/
 .idea/
+*.swp
+*.swo
 
-# Prisma
-prisma/migrations/
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+*.coverage
+
+# Temporary files
+*.tmp
+*.temp
 ```
