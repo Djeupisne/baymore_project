@@ -1,26 +1,20 @@
 ```
 # Dependencies
-.pub/
-.dart_tool/
+node_modules/
 
-# Build artifacts
-build/
-
-# Logs
+# Logs and temp files
 *.log
+*.tmp
 
 # Environment
 .env
 .env.local
-*.env.*
+.env.*
 
-# IDE files
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# Prisma
+prisma/migrations/
 ```
