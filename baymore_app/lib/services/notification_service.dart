@@ -211,4 +211,47 @@ class NotificationService {
     final list = await fetchAll();
     return list.where((n) => !n.read).length;
   }
+
+  /// Méthode interne pour enregistrer une notification de statut de commande
+  /// Appelée par AuthProvider quand une commande change de statut
+  Future<void> _storeFromAuthProvider({
+    required String title,
+    required String body,
+    required NotificationType type,
+    String? orderId,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = await _readAll(prefs);
+    final id = orderId ?? '${DateTime.now().millisecondsSinceEpoch}';
+    
+    // Vérifier si une notification avec le même orderId existe déjà pour éviter les doublons
+    final existingIndex = list.indexWhere((n) => n.data?['orderId'] == orderId && n.type == type);
+    if (existingIndex != -1) {
+      // Mettre à jour la notification existante au lieu d'en créer une nouvelle
+      list[existingIndex] = AppNotification(
+        id: id,
+        title: title,
+        body: body,
+        receivedAt: DateTime.now(),
+        type: type,
+        data: {'orderId': orderId},
+        read: false,
+      );
+    } else {
+      list.insert(0, AppNotification(
+        id: id,
+        title: title,
+        body: body,
+        receivedAt: DateTime.now(),
+        type: type,
+        data: {'orderId': orderId},
+        read: false,
+      ));
+    }
+    
+    await prefs.setString(_storageKey, jsonEncode(list.map((n) => n.toJson()).toList()));
+    for (final cb in _listeners) {
+      cb();
+    }
+  }
 }

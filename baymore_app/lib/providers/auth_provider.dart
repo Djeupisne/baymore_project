@@ -4,6 +4,7 @@ import '../models/app_user.dart';
 import '../models/order_status.dart';
 import '../services/auth_service.dart';
 import '../services/local_notification_service.dart';
+import '../services/notification_service.dart';
 import '../services/token_storage.dart';
 import '../services/socket_service.dart';
 
@@ -52,7 +53,8 @@ class AuthProvider extends ChangeNotifier {
         final statusStr = map['status'] as String?;
         if (statusStr == null) return;
 
-        _notifyStatusChange(statusStr);
+        final orderId = map['id'] as String?;
+        _notifyStatusChange(statusStr, orderId);
 
         if (statusStr == 'LIVRE') {
           refreshProfile();
@@ -61,13 +63,31 @@ class AuthProvider extends ChangeNotifier {
     });
   }
 
-  Future<void> _notifyStatusChange(String statusStr) async {
+  Future<void> _notifyStatusChange(String statusStr, String? orderId) async {
     final status = OrderStatusX.fromString(statusStr);
     final prefs = await SharedPreferences.getInstance();
     final isEnglish = prefs.getString('baymore_locale') == 'en';
     final title = isEnglish ? 'Baymore — Order update' : 'Baymore — Mise à jour de commande';
     final body = isEnglish ? _labelEn(status) : status.label;
+    
+    // Afficher la notification système
     await LocalNotificationService().show(title, body);
+    
+    // Enregistrer dans l'historique pour le badge et l'écran Notifications
+    await NotificationService()._storeForOrder(status, body, orderId);
+  }
+
+  /// Enregistre une notification de statut de commande dans l'historique
+  /// Méthode interne appelée par _notifyStatusChange
+  Future<void> _storeForOrder(OrderStatus status, String body, String? orderId) async {
+    final service = NotificationService();
+    // Utiliser la méthode interne _store via un wrapper
+    await service._storeFromAuthProvider(
+      title: 'Mise à jour de commande',
+      body: body,
+      type: NotificationType.orderStatus,
+      orderId: orderId,
+    );
   }
 
   String _labelEn(OrderStatus status) {
