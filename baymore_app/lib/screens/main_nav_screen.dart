@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../l10n/app_strings.dart';
 import '../providers/cart_provider.dart';
+import '../services/notification_service.dart';
 import '../theme/app_colors.dart';
 import 'cart/cart_screen.dart';
 import 'favorites/favorites_screen.dart';
 import 'home/home_screen.dart';
+import 'notifications/notifications_screen.dart';
 import 'orders/orders_screen.dart';
 import 'profile/profile_screen.dart';
 
@@ -19,6 +21,7 @@ class MainNavScreen extends StatefulWidget {
 
 class _MainNavScreenState extends State<MainNavScreen> {
   int _index = 0;
+  int _unreadCount = 0;
 
   List<Widget> get _screens => [
         const HomeScreen(),
@@ -27,6 +30,28 @@ class _MainNavScreenState extends State<MainNavScreen> {
         const OrdersScreen(),
         const ProfileScreen(),
       ];
+
+  @override
+  void initState() {
+    super.initState();
+    NotificationService.addListener(_onNotificationUpdate);
+    _loadUnreadCount();
+  }
+
+  @override
+  void dispose() {
+    NotificationService.removeListener(_onNotificationUpdate);
+    super.dispose();
+  }
+
+  void _onNotificationUpdate() {
+    if (mounted) _loadUnreadCount();
+  }
+
+  Future<void> _loadUnreadCount() async {
+    final count = await NotificationService().unreadCount();
+    if (mounted) setState(() => _unreadCount = count);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +87,37 @@ class _MainNavScreenState extends State<MainNavScreen> {
             label: '',
           ),
           BottomNavigationBarItem(icon: const Icon(Icons.receipt_long_outlined), activeIcon: const Icon(Icons.receipt_long), label: strings.navOrders),
-          BottomNavigationBarItem(icon: const Icon(Icons.menu), label: strings.navMenu),
+          BottomNavigationBarItem(
+            icon: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                const Icon(Icons.menu),
+                if (_unreadCount > 0)
+                  Positioned(
+                    right: -8,
+                    top: -8,
+                    child: Container(
+                      width: 18,
+                      height: 18,
+                      decoration: const BoxDecoration(
+                        color: AppColors.gold,
+                        shape: BoxShape.circle,
+                      ),
+                      alignment: Alignment.center,
+                      child: Text(
+                        _unreadCount > 9 ? '9+' : '$_unreadCount',
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+            label: strings.navMenu,
+          ),
         ],
       ),
     );
