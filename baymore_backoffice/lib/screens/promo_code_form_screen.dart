@@ -17,6 +17,7 @@ class _PromoCodeFormScreenState extends State<PromoCodeFormScreen> {
   bool _active = true;
   DateTime? _expiresAt;
   bool _saving = false;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -32,6 +33,16 @@ class _PromoCodeFormScreenState extends State<PromoCodeFormScreen> {
     _expiresAt = p?.expiresAt;
   }
 
+  @override
+  void dispose() {
+    _code.dispose();
+    _value.dispose();
+    _maxDiscount.dispose();
+    _minOrder.dispose();
+    _description.dispose();
+    super.dispose();
+  }
+
   Future<void> _pickExpiry() async {
     final picked = await showDatePicker(
       context: context,
@@ -44,7 +55,12 @@ class _PromoCodeFormScreenState extends State<PromoCodeFormScreen> {
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _saving = true);
+    
+    setState(() {
+      _saving = true;
+      _errorMessage = null;
+    });
+
     final promo = PromoCode(
       code: _code.text.trim().toUpperCase(),
       type: _type,
@@ -55,11 +71,34 @@ class _PromoCodeFormScreenState extends State<PromoCodeFormScreen> {
       expiresAt: _expiresAt,
       description: _description.text.trim(),
     );
+
     try {
       await PromoCodeService().save(promo);
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Code promo "${promo.code}" enregistré avec succès !'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString().replaceAll('ApiException: ', '');
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erreur: $_errorMessage'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     } finally {
-      if (mounted) setState(() => _saving = false);
+      if (mounted) {
+        setState(() => _saving = false);
+      }
     }
   }
 
@@ -67,17 +106,49 @@ class _PromoCodeFormScreenState extends State<PromoCodeFormScreen> {
   Widget build(BuildContext context) {
     final isEditing = widget.existing != null;
     return Scaffold(
-      appBar: AppBar(title: Text(isEditing ? 'Modifier le code' : 'Nouveau code promo')),
+      appBar: AppBar(
+        title: Text(isEditing ? 'Modifier le code' : 'Nouveau code promo'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+      ),
       body: Form(
         key: _formKey,
         child: ListView(
           padding: const EdgeInsets.all(20),
           children: [
+            if (_errorMessage != null) ...[
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.red.shade50,
+                  borderRadius: BorderRadius.circular(8),
+                  border: Border.all(color: Colors.red.shade200),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.error_outline, color: Colors.red.shade700, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        _errorMessage!,
+                        style: TextStyle(color: Colors.red.shade700, fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+            ],
             TextFormField(
               controller: _code,
-              enabled: !isEditing, // le code est l'identifiant du document, non modifiable après création
+              enabled: !isEditing,
               textCapitalization: TextCapitalization.characters,
-              decoration: const InputDecoration(labelText: 'Code (ex. BIENVENUE10)'),
+              decoration: const InputDecoration(
+                labelText: 'Code (ex. BIENVENUE10)',
+                hintText: 'Entrez le code promo',
+                prefixIcon: Icon(Icons.tag, color: Color(0xFF1a1a1a)),
+                border: OutlineInputBorder(),
+              ),
               validator: (v) => (v == null || v.trim().length < 3) ? 'Code trop court' : null,
             ),
             const SizedBox(height: 14),
