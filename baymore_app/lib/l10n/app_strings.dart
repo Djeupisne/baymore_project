@@ -123,6 +123,9 @@ class AppStrings {
   // Portefeuille
   String get history => _t('history');
 
+  // Notifications
+  String get close => _t('close');
+
   // ===== FIN DES NOUVEAUX GETTERS =====
 
   static const Map<String, String> _fr = {
@@ -308,6 +311,7 @@ class AppStrings {
     'orderStatusNotification': 'Statut de commande mis à jour',
     'notificationDetails': 'Détails de la notification',
     'viewDetails': 'Voir les détails',
+    'close': 'Fermer',
     // Adresses
     'noAddresses': 'Aucune adresse enregistrée',
     'noAddressesMsg': 'Ajoutez votre adresse pour commander plus rapidement la prochaine fois.',
@@ -575,6 +579,7 @@ class AppStrings {
     'orderStatusNotification': 'Order status updated',
     'notificationDetails': 'Notification details',
     'viewDetails': 'View details',
+    'close': 'Close',
     // Addresses
     'noAddresses': 'No saved addresses',
     'noAddressesMsg': 'Add your address to check out faster next time.',
