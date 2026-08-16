@@ -33,6 +33,7 @@ class PromoCode {
   }
 
   Map<String, dynamic> toJson() => {
+        'code': code,
         'type': type,
         'value': value.round(),
         'maxDiscount': maxDiscount?.round(),
