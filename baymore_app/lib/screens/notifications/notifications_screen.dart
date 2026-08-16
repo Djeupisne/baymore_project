@@ -19,17 +19,84 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
   void initState() {
     super.initState();
     _future = _load();
+    NotificationService.addListener(_onNotificationUpdate);
+  }
+
+  @override
+  void dispose() {
+    NotificationService.removeListener(_onNotificationUpdate);
+    super.dispose();
+  }
+
+  void _onNotificationUpdate() {
+    if (mounted) setState(() => _future = _load());
   }
 
   Future<List<AppNotification>> _load() async {
     final list = await _service.fetchAll();
-    await _service.markAllRead();
     return list;
   }
 
   Future<void> _refresh() async {
     setState(() => _future = _load());
     await _future;
+  }
+
+  String _getNotificationTitle(AppNotification n, AppStrings strings) {
+    switch (n.type) {
+      case NotificationType.orderStatus:
+        return n.title;
+      case NotificationType.promotion:
+        return strings.t('promotionNotification');
+      case NotificationType.newProduct:
+        return strings.t('newProductNotification');
+      case NotificationType.restock:
+        return strings.t('restockNotification');
+      case NotificationType.newOrder:
+        return strings.t('newOrderNotification');
+      case NotificationType.message:
+        return strings.t('messageNotification');
+      case NotificationType.unknown:
+        return n.title;
+    }
+  }
+
+  IconData _getNotificationIcon(AppNotification n) {
+    switch (n.type) {
+      case NotificationType.orderStatus:
+        return Icons.local_shipping_outlined;
+      case NotificationType.promotion:
+        return Icons.local_offer_outlined;
+      case NotificationType.newProduct:
+        return Icons.new_releases_outlined;
+      case NotificationType.restock:
+        return Icons.inventory_2_outlined;
+      case NotificationType.newOrder:
+        return Icons.shopping_bag_outlined;
+      case NotificationType.message:
+        return Icons.chat_bubble_outline;
+      case NotificationType.unknown:
+        return Icons.notifications_none_rounded;
+    }
+  }
+
+  Color _getNotificationColor(AppNotification n) {
+    switch (n.type) {
+      case NotificationType.orderStatus:
+        return AppColors.ink;
+      case NotificationType.promotion:
+        return AppColors.goldDeep;
+      case NotificationType.newProduct:
+        return AppColors.rose;
+      case NotificationType.restock:
+        return AppColors.sage;
+      case NotificationType.newOrder:
+        return AppColors.plum;
+      case NotificationType.message:
+        return AppColors.muted;
+      case NotificationType.unknown:
+        return AppColors.muted;
+    }
   }
 
   @override
@@ -74,6 +141,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
               separatorBuilder: (_, __) => const SizedBox(height: 10),
               itemBuilder: (context, i) {
                 final n = items[i];
+                final iconColor = _getNotificationColor(n);
                 return Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
@@ -86,16 +154,22 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     children: [
                       Container(
                         width: 36, height: 36,
-                        decoration: const BoxDecoration(color: AppColors.ivory, shape: BoxShape.circle),
+                        decoration: BoxDecoration(
+                          color: iconColor.withOpacity(.1),
+                          shape: BoxShape.circle,
+                        ),
                         alignment: Alignment.center,
-                        child: const Icon(Icons.notifications_none_rounded, color: AppColors.goldDeep, size: 18),
+                        child: Icon(_getNotificationIcon(n), color: iconColor, size: 18),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(n.title, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                            Text(
+                              _getNotificationTitle(n, strings),
+                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                            ),
                             const SizedBox(height: 4),
                             Text(n.body, style: const TextStyle(fontSize: 12, color: AppColors.muted, height: 1.4)),
                             const SizedBox(height: 6),
