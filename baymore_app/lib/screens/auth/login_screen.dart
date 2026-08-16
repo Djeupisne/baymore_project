@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
+import '../main_nav_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -17,13 +19,19 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _loading = false;
   String? _error;
 
-  Future<void> _submit() async {
+  Future<void> _submit(AppStrings strings) async {
     if (!_formKey.currentState!.validate()) return;
     setState(() { _loading = true; _error = null; });
     try {
       await context.read<AuthProvider>().login(email: _email.text.trim(), password: _password.text);
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const MainNavScreen()),
+          (route) => false,
+        );
+      }
     } catch (e) {
-      setState(() => _error = "Identifiants incorrects. Vérifiez votre e-mail et mot de passe.");
+      setState(() => _error = strings.t('authLoginError'));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -31,6 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return Scaffold(
       body: SafeArea(
         child: SingleChildScrollView(
@@ -48,23 +57,22 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: const Text('B', style: TextStyle(fontFamily: 'Fraunces', color: AppColors.gold, fontSize: 24, fontWeight: FontWeight.w700)),
                 ),
                 const SizedBox(height: 22),
-                Text('Bon retour', style: Theme.of(context).textTheme.displayMedium),
+                Text(strings.t('authWelcomeBack'), style: Theme.of(context).textTheme.displayMedium),
                 const SizedBox(height: 6),
-                const Text("Connectez-vous pour retrouver vos commandes et vos favoris.",
-                    style: TextStyle(color: AppColors.muted, fontSize: 13)),
+                Text(strings.t('authWelcomeBackMsg'), style: const TextStyle(color: AppColors.muted, fontSize: 13)),
                 const SizedBox(height: 28),
                 TextFormField(
                   controller: _email,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(labelText: 'E-mail'),
-                  validator: (v) => (v == null || !v.contains('@')) ? 'E-mail invalide' : null,
+                  decoration: InputDecoration(labelText: strings.t('authEmail')),
+                  validator: (v) => (v == null || !v.contains('@')) ? strings.t('authEmailInvalid') : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _password,
                   obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Mot de passe'),
-                  validator: (v) => (v == null || v.length < 6) ? '6 caractères minimum' : null,
+                  decoration: InputDecoration(labelText: strings.t('authPassword')),
+                  validator: (v) => (v == null || v.length < 6) ? strings.t('authPasswordMin') : null,
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: 12),
@@ -74,17 +82,17 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _loading ? null : _submit,
+                    onPressed: _loading ? null : () => _submit(strings),
                     child: _loading
                         ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Text('Se connecter'),
+                        : Text(strings.login),
                   ),
                 ),
                 const SizedBox(height: 14),
                 Center(
                   child: TextButton(
                     onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen())),
-                    child: const Text("Pas encore de compte ? Créer un compte", style: TextStyle(color: AppColors.goldDeep, fontWeight: FontWeight.w700, fontSize: 12.5)),
+                    child: Text(strings.t('authNoAccount'), style: const TextStyle(color: AppColors.goldDeep, fontWeight: FontWeight.w700, fontSize: 12.5)),
                   ),
                 ),
               ],

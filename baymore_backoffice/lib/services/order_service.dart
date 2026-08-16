@@ -11,7 +11,7 @@ class OrderService {
   }
 
   Future<void> advanceStatus(String orderId, OrderStatus newStatus) =>
-      _api.patch('/orders/$orderId/status');
+      _api.patch('/orders/$orderId/status', data: {'status': newStatus.toApiString});
 
   Future<void> cancel(String orderId) => _api.patch('/orders/$orderId/status', data: {'status': 'ANNULE'});
 

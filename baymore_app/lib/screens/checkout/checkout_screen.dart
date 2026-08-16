@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../l10n/app_strings.dart';
 import '../../models/app_address.dart';
 import '../../models/order.dart';
 import '../../providers/auth_provider.dart';
@@ -44,11 +45,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Widget build(BuildContext context) {
     final cart = context.watch<CartProvider>();
     final auth = context.watch<AuthProvider>();
+    final strings = AppStrings.of(context);
     final deliveryFee = _mode == DeliveryMode.domicile ? kDeliveryFeeDomicile : 0.0;
     final total = (cart.subtotal + deliveryFee - _discount).clamp(0, double.infinity);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Finaliser la commande')),
+      appBar: AppBar(title: Text(strings.t('checkoutTitle'))),
       body: SafeArea(
         child: Column(
           children: [
@@ -56,24 +58,24 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               child: ListView(
                 padding: const EdgeInsets.all(20),
                 children: [
-                  const Text('Mode de livraison', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+                  Text(strings.t('deliveryModeTitle'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
                   const SizedBox(height: 10),
                   _deliveryOption(
                     mode: DeliveryMode.domicile,
-                    title: 'Livraison à domicile',
-                    subtitle: 'Un livreur vous apporte la commande — ${Formatters.cfa(kDeliveryFeeDomicile)}',
+                    title: strings.t('deliveryHome'),
+                    subtitle: strings.tf('deliveryHomeSubtitle', [Formatters.cfa(kDeliveryFeeDomicile)]),
                     icon: Icons.local_shipping_outlined,
                   ),
                   const SizedBox(height: 10),
                   _deliveryOption(
                     mode: DeliveryMode.retrait,
-                    title: 'Retrait en boutique',
-                    subtitle: 'Récupérez votre commande à la boutique — Gratuit',
+                    title: strings.t('deliveryPickup'),
+                    subtitle: strings.t('deliveryPickupSubtitle'),
                     icon: Icons.storefront_outlined,
                   ),
                   const SizedBox(height: 20),
                   if (_mode == DeliveryMode.domicile) ...[
-                    const Text('Adresse de livraison', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+                    Text(strings.t('deliveryAddressTitle'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
                     const SizedBox(height: 10),
                     if (auth.uid != null) _AddressPicker(
                       uid: auth.uid!,
@@ -87,7 +89,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                       TextField(
                         controller: _addressController,
                         maxLines: 2,
-                        decoration: const InputDecoration(hintText: 'Quartier, rue, repère (ex. non loin de la pharmacie...)'),
+                        decoration: InputDecoration(hintText: strings.t('addressHint')),
                       ),
                     ],
                     const SizedBox(height: 20),
@@ -103,37 +105,37 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     ),
                     const SizedBox(height: 20),
                   ],
-                  const Text('Mode de paiement', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+                  Text(strings.t('paymentModeTitle'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
                   const SizedBox(height: 10),
-                  _paymentOption('especes', 'Paiement à la livraison', 'Espèces remises au livreur ou en boutique', Icons.payments_outlined),
+                  _paymentOption('especes', strings.t('paymentCash'), strings.t('paymentCashSubtitle'), Icons.payments_outlined),
                   const SizedBox(height: 8),
-                  _paymentOption('flooz', 'Flooz (Mobile Money)', 'Paiement Moov Money', Icons.smartphone_outlined),
+                  _paymentOption('flooz', strings.t('paymentFlooz'), strings.t('paymentFloozSubtitle'), Icons.smartphone_outlined),
                   const SizedBox(height: 8),
-                  _paymentOption('tmoney', 'T-Money (Mobile Money)', 'Paiement Togocom', Icons.smartphone_outlined),
+                  _paymentOption('tmoney', strings.t('paymentTmoney'), strings.t('paymentTmoneySubtitle'), Icons.smartphone_outlined),
                   const SizedBox(height: 20),
-                  const Text('Code promo', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+                  Text(strings.t('promoCode'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
                   const SizedBox(height: 10),
                   Row(children: [
                     Expanded(
                       child: TextField(
                         controller: _promoController,
                         textCapitalization: TextCapitalization.characters,
-                        decoration: const InputDecoration(hintText: 'Ex. BIENVENUE10'),
+                        decoration: InputDecoration(hintText: strings.t('promoHint')),
                         enabled: _appliedPromo == null,
                       ),
                     ),
                     const SizedBox(width: 10),
                     if (_appliedPromo == null)
                       ElevatedButton(
-                        onPressed: _checkingPromo ? null : () => _applyPromo(cart.subtotal),
+                        onPressed: _checkingPromo ? null : () => _applyPromo(cart.subtotal, strings),
                         child: _checkingPromo
                             ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                            : const Text('Appliquer'),
+                            : Text(strings.actionApply),
                       )
                     else
                       OutlinedButton(
                         onPressed: () => setState(() { _appliedPromo = null; _discount = 0; _promoMessage = null; _promoController.clear(); }),
-                        child: const Text('Retirer'),
+                        child: Text(strings.actionRemove),
                       ),
                   ]),
                   if (_promoMessage != null) ...[
@@ -141,13 +143,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     Text(_promoMessage!, style: TextStyle(fontSize: 11.5, color: _appliedPromo != null ? AppColors.success : AppColors.danger)),
                   ],
                   const SizedBox(height: 24),
-                  const Text('Récapitulatif', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+                  Text(strings.t('summaryTitle'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
                   const SizedBox(height: 10),
-                  _summaryRow('Sous-total', Formatters.cfa(cart.subtotal)),
-                  _summaryRow('Livraison', deliveryFee == 0 ? 'Gratuit' : Formatters.cfa(deliveryFee)),
-                  if (_discount > 0) _summaryRow('Remise ($_appliedPromo)', '- ${Formatters.cfa(_discount)}'),
+                  _summaryRow(strings.subtotal, Formatters.cfa(cart.subtotal)),
+                  _summaryRow(strings.delivery, deliveryFee == 0 ? strings.free : Formatters.cfa(deliveryFee)),
+                  if (_discount > 0) _summaryRow(strings.tf('discountWithCode', ['$_appliedPromo']), '- ${Formatters.cfa(_discount)}'),
                   const Divider(height: 24, color: AppColors.line),
-                  _summaryRow('Total', Formatters.cfa(total), bold: true),
+                  _summaryRow(strings.total, Formatters.cfa(total), bold: true),
                 ],
               ),
             ),
@@ -157,10 +159,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               child: SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: _placing ? null : () => _placeOrder(cart, auth, deliveryFee, total.toDouble()),
+                  onPressed: _placing ? null : () => _placeOrder(cart, auth, deliveryFee, total.toDouble(), strings),
                   child: _placing
                       ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : Text('Confirmer — ${Formatters.cfa(total)}'),
+                      : Text(strings.tf('confirmWithTotal', [Formatters.cfa(total)])),
                 ),
               ),
             ),
@@ -170,7 +172,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Future<void> _applyPromo(double subtotal) async {
+  Future<void> _applyPromo(double subtotal, AppStrings strings) async {
     if (_promoController.text.trim().isEmpty) return;
     setState(() => _checkingPromo = true);
     final result = await PromoService().validate(_promoController.text, subtotal);
@@ -179,11 +181,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       if (result.valid) {
         _discount = result.discount;
         _appliedPromo = _promoController.text.trim().toUpperCase();
-        _promoMessage = result.message.isNotEmpty ? result.message : 'Code appliqué !';
+        _promoMessage = result.message.isNotEmpty ? result.message : strings.t('promoApplied');
       } else {
         _discount = 0;
         _appliedPromo = null;
-        _promoMessage = result.message.isNotEmpty ? result.message : 'Code invalide ou expiré.';
+        _promoMessage = result.message.isNotEmpty ? result.message : strings.t('promoInvalid');
       }
     });
   }
@@ -251,17 +253,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
   }
 
-  Future<void> _placeOrder(CartProvider cart, AuthProvider auth, double deliveryFee, double total) async {
+  Future<void> _placeOrder(CartProvider cart, AuthProvider auth, double deliveryFee, double total, AppStrings strings) async {
     final address = _mode == DeliveryMode.domicile
         ? (_useNewAddress || _selectedAddress == null ? _addressController.text.trim() : _selectedAddress!.fullAddress)
         : _pickupAddress;
 
     if (_mode == DeliveryMode.domicile && address.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Veuillez indiquer ou choisir votre adresse de livraison.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(strings.t('addressMissing'))));
       return;
     }
     if (auth.uid == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Veuillez vous connecter pour commander.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(strings.t('loginToOrder'))));
       return;
     }
     setState(() => _placing = true);
@@ -302,7 +304,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         );
       }
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Une erreur est survenue. Veuillez réessayer.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(strings.t('orderError'))));
     } finally {
       if (mounted) setState(() => _placing = false);
     }
@@ -340,6 +342,7 @@ class _AddressPickerState extends State<_AddressPicker> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return FutureBuilder<List<AppAddress>>(
       future: _future,
       builder: (context, snap) {
@@ -387,7 +390,7 @@ class _AddressPickerState extends State<_AddressPicker> {
               child: Row(children: [
                 Icon(Icons.add_location_alt_outlined, size: 18, color: widget.useNew ? AppColors.ink : AppColors.muted),
                 const SizedBox(width: 10),
-                const Expanded(child: Text('Utiliser une nouvelle adresse', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5))),
+                Expanded(child: Text(strings.t('useNewAddress'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5))),
                 Icon(widget.useNew ? Icons.radio_button_checked : Icons.radio_button_off, size: 18, color: widget.useNew ? AppColors.ink : AppColors.line),
               ]),
             ),

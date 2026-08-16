@@ -1,7 +1,9 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
+import '../main_nav_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -19,7 +21,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _loading = false;
   String? _error;
 
-  Future<void> _submit() async {
+  Future<void> _submit(AppStrings strings) async {
     if (!_formKey.currentState!.validate()) return;
     setState(() { _loading = true; _error = null; });
     try {
@@ -29,9 +31,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
           phone: _phone.text.trim(),
           password: _password.text,
           referralCode: _referral.text.trim().isEmpty ? null : _referral.text.trim());
-      if (mounted) Navigator.pop(context);
+      if (mounted) {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const MainNavScreen()),
+          (route) => false,
+        );
+      }
     } catch (e) {
-      setState(() => _error = "Impossible de créer le compte. Cet e-mail est peut-être déjà utilisé.");
+      setState(() => _error = strings.t('authRegisterError'));
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -39,8 +46,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Créer un compte')),
+      appBar: AppBar(title: Text(strings.t('authCreateAccount'))),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 10),
@@ -51,35 +59,35 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 TextFormField(
                   controller: _name,
-                  decoration: const InputDecoration(labelText: 'Nom complet'),
-                  validator: (v) => (v == null || v.trim().length < 2) ? 'Nom requis' : null,
+                  decoration: InputDecoration(labelText: strings.t('authFullName')),
+                  validator: (v) => (v == null || v.trim().length < 2) ? strings.t('authNameRequired') : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _email,
                   keyboardType: TextInputType.emailAddress,
-                  decoration: const InputDecoration(labelText: 'E-mail'),
-                  validator: (v) => (v == null || !v.contains('@')) ? 'E-mail invalide' : null,
+                  decoration: InputDecoration(labelText: strings.t('authEmail')),
+                  validator: (v) => (v == null || !v.contains('@')) ? strings.t('authEmailInvalid') : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _phone,
                   keyboardType: TextInputType.phone,
-                  decoration: const InputDecoration(labelText: 'Téléphone (ex. 90 00 00 00)'),
-                  validator: (v) => (v == null || v.trim().length < 8) ? 'Numéro invalide' : null,
+                  decoration: InputDecoration(labelText: strings.t('authPhone')),
+                  validator: (v) => (v == null || v.trim().length < 8) ? strings.t('authPhoneInvalid') : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _password,
                   obscureText: true,
-                  decoration: const InputDecoration(labelText: 'Mot de passe'),
-                  validator: (v) => (v == null || v.length < 6) ? '6 caractères minimum' : null,
+                  decoration: InputDecoration(labelText: strings.t('authPassword')),
+                  validator: (v) => (v == null || v.length < 6) ? strings.t('authPasswordMin') : null,
                 ),
                 const SizedBox(height: 14),
                 TextFormField(
                   controller: _referral,
                   textCapitalization: TextCapitalization.characters,
-                  decoration: const InputDecoration(labelText: 'Code de parrainage (optionnel)'),
+                  decoration: InputDecoration(labelText: strings.t('authReferralCode')),
                 ),
                 if (_error != null) ...[
                   const SizedBox(height: 12),
@@ -89,10 +97,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _loading ? null : _submit,
+                    onPressed: _loading ? null : () => _submit(strings),
                     child: _loading
                         ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Text('Créer mon compte'),
+                        : Text(strings.t('authCreateMyAccount')),
                   ),
                 ),
                 const SizedBox(height: 20),

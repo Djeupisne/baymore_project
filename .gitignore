@@ -1,0 +1,103 @@
+# ==============================
+# Dart / Flutter
+# ==============================
+.dart_tool/
+.packages
+build/
+.flutter-plugins
+.flutter-plugins-dependencies
+
+# ==============================
+# Fichiers IDE
+# ==============================
+*.iml
+.idea/
+.vscode/
+
+# ==============================
+# Android
+# ==============================
+android/local.properties
+android/key.properties
+android/app/src/main/res/drawable-*/
+android/app/src/main/res/mipmap-*/
+android/app/build/
+android/.gradle/
+android/app/.gradle/
+android/captures/
+android/*.iml
+
+# ==============================
+# iOS / macOS
+# ==============================
+ios/Flutter/Flutter.podspec
+**/Pods/
+ios/Pods/
+ios/.symlinks/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+ios/Runner/GeneratedPluginRegistrant.*
+ios/*.xcworkspace/xcuserdata/
+ios/*.xcodeproj/xcuserdata/
+Podfile.lock
+
+macos/Pods/
+macos/.symlinks/
+macos/Flutter/GeneratedPluginRegistrant.*
+macos/*.xcworkspace/xcuserdata/
+macos/*.xcodeproj/xcuserdata/
+
+# ==============================
+# Archives / fichiers compressés
+# ==============================
+*.zip
+*.rar
+*.7z
+*.tar.gz
+*.tgz
+*.dmg
+*.pkg
+baymore_backoffice.zip
+
+# ==============================
+# Fichiers de configuration sensibles
+# ==============================
+.env
+.env.*
+*.pem
+*.key
+*.crt
+secrets.json
+secrets.yaml
+
+# ==============================
+# Fichiers de cache / logs / temporaires
+# ==============================
+*.log
+*.cache
+*.tmp
+*.temp
+*.bak
+*.swp
+*.swo
+*~
+
+# ==============================
+# Fichiers système
+# ==============================
+.DS_Store
+Thumbs.db
+.directory
+Desktop.ini
+
+# ==============================
+# Dossiers spécifiques au projet
+# ==============================
+baymore_backoffice/.dart_tool/
+baymore_backoffice/build/
+baymore_backoffice/.flutter-plugins-dependencies
+node_modules/
+vendor/
+packages/

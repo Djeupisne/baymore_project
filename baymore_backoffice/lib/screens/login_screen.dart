@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../services/staff_auth_service.dart';
 import '../theme/app_colors.dart';
+import 'dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,11 +18,22 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _submit() async {
     setState(() { _loading = true; _error = null; });
     try {
+      print('🔑 Tentative de login: ${_email.text}');
       final name = await StaffAuthService().login(_email.text.trim(), _password.text);
-      if (name == null && mounted) {
+      print('👤 Nom retourné: $name');
+
+      if (name != null && mounted) {
+        print('✅ Login réussi, redirection vers le dashboard');
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (_) => const DashboardScreen()),
+        );
+      } else if (mounted) {
+        print('❌ Login échoué: nom null');
         setState(() => _error = "Ce compte n'est pas autorisé sur le back-office Baymore.");
       }
     } catch (e) {
+      print('❌ Erreur: $e');
       setState(() => _error = 'Identifiants incorrects.');
     } finally {
       if (mounted) setState(() => _loading = false);

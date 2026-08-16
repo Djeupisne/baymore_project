@@ -1,9 +1,0 @@
-.dart_tool/
-.packages
-build/
-.flutter-plugins
-.flutter-plugins-dependencies
-android/local.properties
-android/app/google-services.json
-ios/Runner/GoogleService-Info.plist
-.DS_Store

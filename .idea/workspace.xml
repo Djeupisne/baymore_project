@@ -4,7 +4,101 @@
     <option name="autoReloadType" value="NONE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="e9455623-58d1-45d0-8021-5c9d6a6f4026" name="Changes" comment="" />
+    <list default="true" id="e9455623-58d1-45d0-8021-5c9d6a6f4026" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/baymore_project.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/libraries/Flutter_Plugins.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/android/app/build.gradle.kts" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/android/app/build.gradle.kts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/android/app/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/android/app/src/main/AndroidManifest.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/android/app/src/main/res/mipmap-mdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/android/app/src/main/res/mipmap-mdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/AppDelegate.swift" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/AppDelegate.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/ios/Runner/Info.plist" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/ios/Runner/Info.plist" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/app.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/app.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/config/api_config.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/config/api_config.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/models/order.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/models/order.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/models/order_status.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/models/order_status.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/models/return_request.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/models/return_request.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/providers/auth_provider.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/providers/auth_provider.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/auth/login_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/auth/login_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/auth/register_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/auth/register_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/cart/cart_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/cart/cart_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/checkout/checkout_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/checkout/checkout_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/checkout/payment_pending_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/checkout/payment_pending_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/favorites/favorites_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/favorites/favorites_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/home/category_products_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/home/category_products_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/home/home_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/home/home_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/home/search_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/home/search_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/main_nav_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/main_nav_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/orders/order_tracking_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/orders/order_tracking_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/orders/orders_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/orders/orders_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/product/product_detail_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/product/product_detail_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/profile/addresses_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/profile/addresses_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/profile/edit_profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/profile/edit_profile_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/profile/loyalty_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/profile/loyalty_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/profile/profile_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/profile/profile_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/profile/promo_list_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/profile/promo_list_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/profile/settings_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/profile/settings_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/profile/wallet_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/profile/wallet_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/screens/splash_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/screens/splash_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/services/notification_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/services/notification_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/utils/formatters.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/utils/formatters.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/widgets/order_status_stepper.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/widgets/order_status_stepper.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/lib/widgets/product_filter_sheet.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/lib/widgets/product_filter_sheet.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/macos/Flutter/GeneratedPluginRegistrant.swift" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/macos/Flutter/GeneratedPluginRegistrant.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_1024.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_1024.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_128.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_128.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_16.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_16.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_256.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_256.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_32.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_32.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_512.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_512.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_64.png" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/macos/Runner/Assets.xcassets/AppIcon.appiconset/app_icon_64.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/pubspec.lock" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/pubspec.lock" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_app/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_app/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/.idea/libraries/Dart_SDK.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/.idea/libraries/KotlinJavaRuntime.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/.idea/modules.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/.idea/runConfigurations/main_dart.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/.idea/workspace.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/baymore_backoffice.iml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/lib/.gitkeep" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/lib/config/api_config.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_backoffice/lib/config/api_config.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_backoffice/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/lib/models/order_status.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_backoffice/lib/models/order_status.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/lib/screens/customer_detail_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_backoffice/lib/screens/customer_detail_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/lib/screens/login_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_backoffice/lib/screens/login_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/lib/screens/orders_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_backoffice/lib/screens/orders_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/lib/screens/overview_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_backoffice/lib/screens/overview_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/lib/screens/returns_screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_backoffice/lib/screens/returns_screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/lib/services/api_client.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_backoffice/lib/services/api_client.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/lib/services/image_upload_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_backoffice/lib/services/image_upload_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/lib/services/order_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_backoffice/lib/services/order_service.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/baymore_backoffice/lib/services/staff_auth_service.dart" beforeDir="false" afterPath="$PROJECT_DIR$/baymore_backoffice/lib/services/staff_auth_service.dart" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -13,29 +107,35 @@
   <component name="ClangdSettings">
     <option name="formatViaClangd" value="false" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "customColor": "",
-  "associatedIndex": 1
-}]]></component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 1
+}</component>
   <component name="ProjectId" id="3HjrC9QkB6hnvm4Xy9UUsCamaat" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.cidr.known.project.marker": "true",
-    "RunOnceActivity.readMode.enableVisualFormatting": "true",
-    "cf.first.check.clang-format": "false",
-    "cidr.known.project.marker": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "kotlin-language-version-configured": "true",
-    "show.migrate.to.gradle.popup": "false"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.readMode.enableVisualFormatting&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;cf.first.check.clang-format&quot;: &quot;false&quot;,
+    &quot;cidr.known.project.marker&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;
   }
-}]]></component>
+}</component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="e9455623-58d1-45d0-8021-5c9d6a6f4026" name="Changes" comment="" />

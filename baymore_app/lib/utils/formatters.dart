@@ -8,7 +8,11 @@ class Formatters {
   /// Formate un montant en Francs CFA, ex. 18500 -> "18 500 F"
   static String cfa(num amount) => '${_cfaFormat.format(amount)} F';
 
-  static String date(DateTime d) => DateFormat('dd MMM yyyy, HH:mm', 'fr_FR').format(d);
+  /// [localeCode] : 'fr' ou 'en' — passer la langue courante (AppStrings /
+  /// LocaleProvider) pour que les dates suivent la langue choisie.
+  static String date(DateTime d, {String localeCode = 'fr'}) =>
+      DateFormat('dd MMM yyyy, HH:mm', localeCode == 'en' ? 'en_US' : 'fr_FR').format(d);
 
-  static String shortDate(DateTime d) => DateFormat('dd MMM, HH:mm', 'fr_FR').format(d);
+  static String shortDate(DateTime d, {String localeCode = 'fr'}) =>
+      DateFormat('dd MMM, HH:mm', localeCode == 'en' ? 'en_US' : 'fr_FR').format(d);
 }

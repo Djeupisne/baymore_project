@@ -2,6 +2,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import '../../l10n/app_strings.dart';
 import '../../models/product.dart';
 import '../../models/review.dart';
 import '../../providers/auth_provider.dart';
@@ -32,13 +33,14 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return Scaffold(
       body: FutureBuilder<Product?>(
         future: _service.getById(widget.productId),
         builder: (context, snap) {
           if (!snap.hasData) return const Center(child: CircularProgressIndicator());
           final product = snap.data;
-          if (product == null) return const Center(child: Text('Article introuvable'));
+          if (product == null) return Center(child: Text(strings.t('productNotFound')));
           final fav = context.watch<FavoritesProvider>();
 
           return SafeArea(
@@ -110,7 +112,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               ]),
                               const SizedBox(height: 18),
                               if (product.sizes.isNotEmpty) ...[
-                                const Text('Taille', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
+                                Text(strings.size, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
                                 const SizedBox(height: 8),
                                 Wrap(spacing: 8, children: product.sizes.map((s) {
                                   final selected = _selectedSize == s;
@@ -127,7 +129,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 const SizedBox(height: 18),
                               ],
                               if (product.colors.isNotEmpty) ...[
-                                const Text('Couleur', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
+                                Text(strings.color, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
                                 const SizedBox(height: 8),
                                 Wrap(spacing: 8, children: product.colors.map((c) {
                                   final selected = _selectedColor == c;
@@ -143,12 +145,12 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                                 }).toList()),
                                 const SizedBox(height: 18),
                               ],
-                              const Text('Description', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
+                              Text(strings.description, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
                               const SizedBox(height: 6),
-                              Text(product.description.isEmpty ? 'Aucune description disponible pour cet article.' : product.description,
+                              Text(product.description.isEmpty ? strings.t('noDescription') : product.description,
                                   style: const TextStyle(fontSize: 12.5, color: AppColors.inkSoft, height: 1.5)),
                               const SizedBox(height: 10),
-                              Text(product.inStock ? 'En stock (${product.stock} disponibles)' : 'Rupture de stock',
+                              Text(product.inStock ? strings.tf('inStock', ['${product.stock}']) : strings.outOfStock,
                                   style: TextStyle(fontSize: 12, fontWeight: FontWeight.w700, color: product.inStock ? AppColors.success : AppColors.danger)),
                               const SizedBox(height: 24),
                               _ReviewsSection(product: product),
@@ -179,11 +181,11 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                               onPressed: () {
                                 context.read<CartProvider>().addItem(product, size: _selectedSize, color: _selectedColor, quantity: _quantity);
                                 ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                  content: Text('${product.name} ajouté au panier'),
-                                  action: SnackBarAction(label: 'VOIR', textColor: AppColors.gold, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()))),
+                                  content: Text(strings.tf('addedToCart', [product.name])),
+                                  action: SnackBarAction(label: strings.t('viewCart'), textColor: AppColors.gold, onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CartScreen()))),
                                 ));
                               },
-                              child: Text('Ajouter au panier — ${Formatters.cfa(product.price * _quantity)}'),
+                              child: Text(strings.tf('addToCartWithPrice', [Formatters.cfa(product.price * _quantity)])),
                             ),
                           ),
                         ])
@@ -220,14 +222,15 @@ class _ReviewsSectionState extends State<_ReviewsSection> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          const Text('Avis clients', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+          Text(strings.t('customerReviews'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
           TextButton(
-            onPressed: () => _openReviewDialog(context),
-            child: const Text('Laisser un avis', style: TextStyle(color: AppColors.goldDeep, fontWeight: FontWeight.w700, fontSize: 12)),
+            onPressed: () => _openReviewDialog(context, strings),
+            child: Text(strings.t('leaveReview'), style: const TextStyle(color: AppColors.goldDeep, fontWeight: FontWeight.w700, fontSize: 12)),
           ),
         ]),
         const SizedBox(height: 8),
@@ -237,10 +240,10 @@ class _ReviewsSectionState extends State<_ReviewsSection> {
             if (!snap.hasData) return const SizedBox(height: 40, child: Center(child: CircularProgressIndicator(strokeWidth: 2)));
             final reviews = snap.data!;
             if (reviews.isEmpty) {
-              return const Padding(
-                padding: EdgeInsets.symmetric(vertical: 8),
-                child: Text('Aucun avis pour le moment — soyez le premier à donner votre avis.',
-                    style: TextStyle(fontSize: 12, color: AppColors.muted)),
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Text(strings.t('noReviewsYet'),
+                    style: const TextStyle(fontSize: 12, color: AppColors.muted)),
               );
             }
             return Column(
@@ -268,10 +271,10 @@ class _ReviewsSectionState extends State<_ReviewsSection> {
     );
   }
 
-  void _openReviewDialog(BuildContext context) {
+  void _openReviewDialog(BuildContext context, AppStrings strings) {
     final auth = context.read<AuthProvider>();
     if (auth.uid == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Connectez-vous pour laisser un avis.')));
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(strings.t('loginToReview'))));
       return;
     }
     double rating = 5;
@@ -281,21 +284,21 @@ class _ReviewsSectionState extends State<_ReviewsSection> {
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
-          title: const Text('Votre avis'),
+          title: Text(strings.t('yourReview')),
           content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
             StarRating(rating: rating, size: 26, onRate: (v) => setState(() => rating = v.toDouble())),
             const SizedBox(height: 12),
-            TextField(controller: commentCtrl, maxLines: 3, decoration: const InputDecoration(hintText: 'Votre commentaire (optionnel)')),
+            TextField(controller: commentCtrl, maxLines: 3, decoration: InputDecoration(hintText: strings.t('yourCommentOptional'))),
           ]),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
+            TextButton(onPressed: () => Navigator.pop(context), child: Text(strings.actionCancel)),
             ElevatedButton(
               onPressed: () async {
                 await _reviewService.add(widget.product.id, rating: rating, comment: commentCtrl.text.trim());
                 if (context.mounted) Navigator.pop(context);
                 this.setState(() => _future = _reviewService.fetchForProduct(widget.product.id));
               },
-              child: const Text('Publier'),
+              child: Text(strings.actionPublish),
             ),
           ],
         ),
@@ -331,14 +334,15 @@ class _StockAlertButtonState extends State<_StockAlertButton> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final strings = AppStrings.of(context);
     if (auth.uid == null) {
       return SizedBox(
         width: double.infinity,
         child: OutlinedButton.icon(
           onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(content: Text('Connectez-vous pour être averti du retour en stock.'))),
+              SnackBar(content: Text(strings.t('loginToBeNotified')))),
           icon: const Icon(Icons.notifications_none, size: 18),
-          label: const Text('Me prévenir du retour en stock'),
+          label: Text(strings.t('notifyMeRestock')),
         ),
       );
     }
@@ -358,12 +362,12 @@ class _StockAlertButtonState extends State<_StockAlertButton> {
                   setState(() => _subscribed = true);
                   if (context.mounted) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Vous serez notifié dès que cet article sera de nouveau disponible.')));
+                        SnackBar(content: Text(strings.t('notifiedWhenBack'))));
                   }
                 }
               },
         icon: Icon(subscribed ? Icons.notifications_active : Icons.notifications_none, size: 18, color: subscribed ? AppColors.gold : AppColors.ink),
-        label: Text(subscribed ? 'Vous serez prévenu(e)' : 'Me prévenir du retour en stock'),
+        label: Text(subscribed ? strings.t('youWillBeNotified') : strings.t('notifyMeRestock')),
       ),
     );
   }

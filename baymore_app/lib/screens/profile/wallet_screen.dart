@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/api_client.dart';
 import '../../theme/app_colors.dart';
@@ -29,8 +30,10 @@ class _WalletScreenState extends State<WalletScreen> {
   @override
   Widget build(BuildContext context) {
     context.watch<AuthProvider>();
+    final strings = AppStrings.of(context);
+    final localeCode = Localizations.localeOf(context).languageCode;
     return Scaffold(
-      appBar: AppBar(title: const Text('Mon portefeuille')),
+      appBar: AppBar(title: Text(strings.myWallet)),
       body: FutureBuilder<Map<String, dynamic>>(
         future: _future,
         builder: (context, snap) {
@@ -47,25 +50,25 @@ class _WalletScreenState extends State<WalletScreen> {
                 borderRadius: BorderRadius.circular(18),
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                const Text('Solde disponible', style: TextStyle(color: Color(0xFFC9BFA8), fontSize: 11)),
+                Text(strings.t('availableBalance'), style: const TextStyle(color: Color(0xFFC9BFA8), fontSize: 11)),
                 const SizedBox(height: 6),
                 Text(Formatters.cfa(balance), style: const TextStyle(fontFamily: 'Fraunces', color: Colors.white, fontSize: 26, fontWeight: FontWeight.w700)),
                 const SizedBox(height: 8),
-                const Text('2% de cashback crédité automatiquement à chaque commande livrée',
-                    style: TextStyle(color: Color(0xFFC9BFA8), fontSize: 11, height: 1.4)),
+                Text(strings.t('cashbackNote'),
+                    style: const TextStyle(color: Color(0xFFC9BFA8), fontSize: 11, height: 1.4)),
               ]),
             ),
-            const Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20),
-              child: Row(children: [Text('Historique', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14))]),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Row(children: [Text(strings.history, style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14))]),
             ),
             const SizedBox(height: 10),
             Expanded(
               child: transactions.isEmpty
-                  ? const EmptyState(
+                  ? EmptyState(
                       icon: Icons.account_balance_wallet_outlined,
-                      title: 'Aucune transaction pour le moment',
-                      message: 'Votre cashback apparaîtra ici après votre première commande livrée.',
+                      title: strings.t('noTransactions'),
+                      message: strings.t('noTransactionsMsg'),
                     )
                   : ListView.builder(
                       padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
@@ -82,8 +85,8 @@ class _WalletScreenState extends State<WalletScreen> {
                             const SizedBox(width: 10),
                             Expanded(
                               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                Text(t['reason'] ?? 'Cashback', style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
-                                Text(DateFormat('dd MMM yyyy', 'fr_FR').format(createdAt), style: const TextStyle(fontSize: 10.5, color: AppColors.muted)),
+                                Text(t['reason'] ?? strings.t('cashback'), style: const TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600)),
+                                Text(DateFormat('dd MMM yyyy', localeCode == 'en' ? 'en_US' : 'fr_FR').format(createdAt), style: const TextStyle(fontSize: 10.5, color: AppColors.muted)),
                               ]),
                             ),
                             Text('+${Formatters.cfa(t['amount'] ?? 0)}', style: const TextStyle(color: AppColors.success, fontWeight: FontWeight.w700, fontSize: 13)),

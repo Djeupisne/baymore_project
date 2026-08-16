@@ -1,3 +1,6 @@
+import 'package:flutter/widgets.dart';
+import '../l10n/app_strings.dart';
+
 enum ReturnStatus { enAttente, approuve, refuse, rembourse }
 
 extension ReturnStatusX on ReturnStatus {
@@ -15,6 +18,18 @@ extension ReturnStatusX on ReturnStatus {
       case ReturnStatus.approuve: return 'Retour approuvé';
       case ReturnStatus.refuse: return 'Retour refusé';
       case ReturnStatus.rembourse: return 'Remboursé';
+    }
+  }
+
+  /// Libellé traduit selon la langue choisie — à préférer à [label] partout
+  /// où un BuildContext est disponible.
+  String labelFor(BuildContext context) {
+    final s = AppStrings.of(context);
+    switch (this) {
+      case ReturnStatus.enAttente: return s.t('returnStatusPending');
+      case ReturnStatus.approuve: return s.t('returnStatusApproved');
+      case ReturnStatus.refuse: return s.t('returnStatusRefused');
+      case ReturnStatus.rembourse: return s.t('returnStatusRefunded');
     }
   }
 }

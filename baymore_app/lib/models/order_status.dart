@@ -1,5 +1,8 @@
 /// Les 4 étapes du suivi de commande : reçue -> prise en charge -> en route -> livrée.
 /// Les valeurs correspondent exactement à l'enum Postgres/Prisma côté backend.
+import 'package:flutter/widgets.dart';
+import '../l10n/app_strings.dart';
+
 enum OrderStatus { enAttente, priseEnCharge, enRoute, livree, annulee }
 
 extension OrderStatusX on OrderStatus {
@@ -75,6 +78,30 @@ extension OrderStatusX on OrderStatus {
         return 3;
       case OrderStatus.annulee:
         return -1;
+    }
+  }
+
+  /// Libellé traduit selon la langue choisie dans les Paramètres — à
+  /// préférer à [label] partout où un BuildContext est disponible.
+  String labelFor(BuildContext context) {
+    final s = AppStrings.of(context);
+    switch (this) {
+      case OrderStatus.enAttente: return s.statusPending;
+      case OrderStatus.priseEnCharge: return s.statusPickedUp;
+      case OrderStatus.enRoute: return s.statusEnRoute;
+      case OrderStatus.livree: return s.statusDelivered;
+      case OrderStatus.annulee: return s.statusCancelled;
+    }
+  }
+
+  String descriptionFor(BuildContext context) {
+    final s = AppStrings.of(context);
+    switch (this) {
+      case OrderStatus.enAttente: return s.statusPendingDesc;
+      case OrderStatus.priseEnCharge: return s.statusPickedUpDesc;
+      case OrderStatus.enRoute: return s.statusEnRouteDesc;
+      case OrderStatus.livree: return s.statusDeliveredDesc;
+      case OrderStatus.annulee: return s.statusCancelledDesc;
     }
   }
 }

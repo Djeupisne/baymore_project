@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../l10n/app_strings.dart';
 import '../../models/order.dart';
 import '../../models/order_status.dart';
 import '../../models/return_request.dart';
@@ -11,6 +11,7 @@ import '../../services/order_service.dart';
 import '../../services/return_service.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/formatters.dart';
+import '../../widgets/driver_map.dart';
 import '../../widgets/order_status_stepper.dart';
 
 /// Écran de suivi en temps réel : chaque mise à jour du statut faite côté
@@ -31,14 +32,15 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Suivi de la commande')),
+      appBar: AppBar(title: Text(strings.t('orderTrackingTitle'))),
       body: StreamBuilder<AppOrder?>(
         stream: _service.watchOrder(widget.orderId),
         builder: (context, snap) {
           if (!snap.hasData) return const Center(child: CircularProgressIndicator());
           final order = snap.data;
-          if (order == null) return const Center(child: Text('Commande introuvable'));
+          if (order == null) return Center(child: Text(strings.t('orderNotFound')));
 
           return SingleChildScrollView(
             padding: const EdgeInsets.all(20),
@@ -59,12 +61,12 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text(order.status.label,
+                        Text(order.status.labelFor(context),
                             style: TextStyle(
                                 fontFamily: 'Fraunces', fontWeight: FontWeight.w600, fontSize: 15,
                                 color: order.status == OrderStatus.livree ? AppColors.success : AppColors.ivory)),
                         const SizedBox(height: 2),
-                        Text(order.status.description,
+                        Text(order.status.descriptionFor(context),
                             style: TextStyle(
                                 fontSize: 11.5,
                                 color: order.status == OrderStatus.livree ? AppColors.inkSoft : const Color(0xFFC9BFA8))),
@@ -76,27 +78,13 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
 
                 // Carte en temps réel du livreur pendant l'étape "en route"
                 if (order.status == OrderStatus.enRoute && order.driverLat != null && order.driverLng != null) ...[
-                  const Text('Position du livreur', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+                  Text(strings.t('driverPosition'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
                   const SizedBox(height: 10),
                   ClipRRect(
                     borderRadius: BorderRadius.circular(16),
                     child: SizedBox(
                       height: 200,
-                      child: GoogleMap(
-                        initialCameraPosition: CameraPosition(
-                          target: LatLng(order.driverLat!, order.driverLng!),
-                          zoom: 14,
-                        ),
-                        markers: {
-                          Marker(
-                            markerId: const MarkerId('driver'),
-                            position: LatLng(order.driverLat!, order.driverLng!),
-                            infoWindow: InfoWindow(title: order.driverName ?? 'Livreur'),
-                          ),
-                        },
-                        zoomControlsEnabled: false,
-                        myLocationButtonEnabled: false,
-                      ),
+                      child: DriverMap(lat: order.driverLat!, lng: order.driverLng!, driverName: order.driverName),
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -110,7 +98,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                         Expanded(
                           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             Text(order.driverName!, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
-                            const Text('Votre livreur', style: TextStyle(fontSize: 10.5, color: AppColors.muted)),
+                            Text(strings.t('yourDriver'), style: const TextStyle(fontSize: 10.5, color: AppColors.muted)),
                           ]),
                         ),
                         if (order.driverPhone != null)
@@ -120,12 +108,12 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   const SizedBox(height: 24),
                 ],
 
-                const Text('Étapes de la commande', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+                Text(strings.t('orderSteps'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
                 const SizedBox(height: 14),
                 OrderStatusStepper(status: order.status),
 
                 const SizedBox(height: 8),
-                const Text('Détails de la commande', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
+                Text(strings.t('orderDetails'), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13.5)),
                 const SizedBox(height: 10),
                 Container(
                   decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.line)),
@@ -142,12 +130,12 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     Padding(
                       padding: const EdgeInsets.all(14),
                       child: Column(children: [
-                        _row('Mode de livraison', order.deliveryMode.label),
-                        _row('Adresse', order.deliveryAddress),
-                        _row('Paiement', _paymentLabel(order.paymentMethod)),
-                        if (order.discount > 0) _row('Remise${order.promoCode != null ? ' (${order.promoCode})' : ''}', '- ${Formatters.cfa(order.discount)}'),
+                        _row(strings.t('deliveryModeLabel'), order.deliveryMode.labelFor(context)),
+                        _row(strings.t('addressLabel'), order.deliveryAddress),
+                        _row(strings.t('paymentLabel'), _paymentLabel(order.paymentMethod, strings)),
+                        if (order.discount > 0) _row(strings.tf('discountLabel', [order.promoCode != null ? ' (${order.promoCode})' : '']), '- ${Formatters.cfa(order.discount)}'),
                         const SizedBox(height: 6),
-                        _row('Total', Formatters.cfa(order.total), bold: true),
+                        _row(strings.t('totalLabel'), Formatters.cfa(order.total), bold: true),
                       ]),
                     ),
                   ]),
@@ -158,7 +146,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton.icon(
-                      onPressed: _cancelling ? null : () => _confirmCancel(context, order.id),
+                      onPressed: _cancelling ? null : () => _confirmCancel(context, order.id, strings),
                       icon: _cancelling
                           ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2))
                           : const Icon(Icons.close, size: 18, color: AppColors.danger),
@@ -176,7 +164,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                     child: OutlinedButton.icon(
                       onPressed: () => _shareReceipt(order),
                       icon: const Icon(Icons.share_outlined, size: 18),
-                      label: const Text('Partager le reçu'),
+                      label: Text(strings.t('shareReceipt')),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -187,7 +175,7 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
                 OutlinedButton.icon(
                   onPressed: () => _contactSupport(order.id),
                   icon: const Icon(Icons.chat_bubble_outline, size: 18),
-                  label: const Text('Une question sur cette commande ? Contactez-nous'),
+                  label: Text(strings.t('contactAboutOrder')),
                 ),
                 const SizedBox(height: 24),
               ],
@@ -198,18 +186,18 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     );
   }
 
-  Future<void> _confirmCancel(BuildContext context, String orderId) async {
+  Future<void> _confirmCancel(BuildContext context, String orderId, AppStrings strings) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Annuler la commande ?'),
-        content: const Text('Cette action est définitive. Vous pourrez toujours recommander ces articles plus tard.'),
+        title: Text(strings.t('cancelOrderTitle')),
+        content: Text(strings.t('cancelOrderMsg')),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Retour')),
+          TextButton(onPressed: () => Navigator.pop(context, false), child: Text(strings.t('back'))),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Oui, annuler'),
+            child: Text(strings.t('yesCancel')),
           ),
         ],
       ),
@@ -245,11 +233,11 @@ class _OrderTrackingScreenState extends State<OrderTrackingScreen> {
     await launchUrl(uri, mode: LaunchMode.externalApplication);
   }
 
-  String _paymentLabel(String v) {
+  String _paymentLabel(String v, AppStrings strings) {
     switch (v) {
-      case 'flooz': return 'Flooz (Mobile Money)';
-      case 'tmoney': return 'T-Money (Mobile Money)';
-      default: return 'Paiement à la livraison';
+      case 'flooz': return strings.t('paymentFlooz');
+      case 'tmoney': return strings.t('paymentTmoney');
+      default: return strings.t('paymentCash');
     }
   }
 
@@ -288,6 +276,7 @@ class _ReturnRequestSectionState extends State<_ReturnRequestSection> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return FutureBuilder<ReturnRequest?>(
       future: _future,
       builder: (context, snap) {
@@ -307,7 +296,7 @@ class _ReturnRequestSectionState extends State<_ReturnRequestSection> {
               const SizedBox(width: 10),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('Demande de retour : ${existing.status.label}', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5, color: color)),
+                  Text(strings.tf('returnRequestStatus', [existing.status.labelFor(context)]), style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5, color: color)),
                   if (existing.staffNote != null && existing.staffNote!.isNotEmpty)
                     Padding(padding: const EdgeInsets.only(top: 4), child: Text(existing.staffNote!, style: const TextStyle(fontSize: 11.5, color: AppColors.muted))),
                 ]),
@@ -318,16 +307,16 @@ class _ReturnRequestSectionState extends State<_ReturnRequestSection> {
         return SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
-            onPressed: () => _openReturnDialog(context),
+            onPressed: () => _openReturnDialog(context, strings),
             icon: const Icon(Icons.assignment_return_outlined, size: 18),
-            label: const Text('Demander un retour ou remboursement'),
+            label: Text(strings.t('requestReturn')),
           ),
         );
       },
     );
   }
 
-  void _openReturnDialog(BuildContext context) {
+  void _openReturnDialog(BuildContext context, AppStrings strings) {
     final auth = context.read<AuthProvider>();
     if (auth.uid == null) return;
     final reasonCtrl = TextEditingController();
@@ -335,14 +324,14 @@ class _ReturnRequestSectionState extends State<_ReturnRequestSection> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Retour ou remboursement'),
+        title: Text(strings.t('returnDialogTitle')),
         content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Text('Expliquez brièvement la raison de votre demande.', style: TextStyle(fontSize: 12, color: AppColors.muted)),
+          Text(strings.t('returnDialogMsg'), style: const TextStyle(fontSize: 12, color: AppColors.muted)),
           const SizedBox(height: 10),
           TextField(controller: reasonCtrl, maxLines: 3, decoration: const InputDecoration(hintText: 'Ex. article endommagé, mauvaise taille...')),
         ]),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Annuler')),
+          TextButton(onPressed: () => Navigator.pop(context), child: Text(strings.actionCancel)),
           ElevatedButton(
             onPressed: () async {
               if (reasonCtrl.text.trim().isEmpty) return;
@@ -350,7 +339,7 @@ class _ReturnRequestSectionState extends State<_ReturnRequestSection> {
               if (context.mounted) Navigator.pop(context);
               setState(() => _future = _returnService.fetchForOrder(widget.order.id));
             },
-            child: const Text('Envoyer la demande'),
+            child: Text(strings.t('sendRequest')),
           ),
         ],
       ),

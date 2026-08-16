@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_strings.dart';
 import '../../models/product.dart';
 import '../../models/product_filters.dart';
 import '../../services/product_service.dart';
@@ -29,6 +30,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return Scaffold(
       appBar: AppBar(title: Text(widget.label)),
       body: FutureBuilder<List<Product>>(
@@ -39,10 +41,10 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
           final products = _filters.apply(allProducts);
 
           if (allProducts.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.inventory_2_outlined,
-              title: 'Aucun article ici pour le moment',
-              message: 'De nouveaux articles arrivent bientôt dans cette catégorie.',
+              title: strings.t('noItemsYet'),
+              message: strings.t('noItemsYetMsg'),
             );
           }
 
@@ -50,7 +52,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               child: Row(children: [
-                Text('${products.length} article(s)', style: const TextStyle(fontSize: 12, color: AppColors.muted, fontWeight: FontWeight.w600)),
+                Text(strings.tf('itemsCount', ['${products.length}']), style: const TextStyle(fontSize: 12, color: AppColors.muted, fontWeight: FontWeight.w600)),
                 const Spacer(),
                 OutlinedButton.icon(
                   onPressed: () async {
@@ -58,7 +60,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
                     if (updated != null) setState(() => _filters = updated);
                   },
                   icon: const Icon(Icons.tune, size: 16),
-                  label: Text(_filters.isActive ? 'Filtres (${_filters.activeCount})' : 'Filtres'),
+                  label: Text(_filters.isActive ? '${strings.t('filters')} (${_filters.activeCount})' : strings.t('filters')),
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     side: BorderSide(color: _filters.isActive ? AppColors.ink : AppColors.line),
@@ -69,7 +71,7 @@ class _CategoryProductsScreenState extends State<CategoryProductsScreen> {
             ),
             Expanded(
               child: products.isEmpty
-                  ? const EmptyState(icon: Icons.filter_alt_off_outlined, title: 'Aucun article avec ces filtres', message: 'Essayez d\'élargir vos filtres.')
+                  ? EmptyState(icon: Icons.filter_alt_off_outlined, title: strings.t('noItemsFiltered'), message: strings.t('tryWiderFilters'))
                   : GridView.builder(
                       padding: const EdgeInsets.all(20),
                       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

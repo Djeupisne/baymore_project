@@ -74,7 +74,7 @@ class _ReturnCard extends StatelessWidget {
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.line)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('Commande #${request.orderId.substring(0, 6).toUpperCase()}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+          Text('Commande #${(request.orderId.length >= 6 ? request.orderId.substring(0, 6) : request.orderId).toUpperCase()}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(color: _color.withOpacity(.12), borderRadius: BorderRadius.circular(20)),

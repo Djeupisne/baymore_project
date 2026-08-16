@@ -4,8 +4,8 @@
 class ApiConfig {
   ApiConfig._();
 
-  static const String baseUrl = 'https://buy-0ja2.onrender.com/api';
-  static const String socketUrl = 'https://buy-0ja2.onrender.com';
+  static const String baseUrl = 'https://baymore-project.onrender.com/api';
+  static const String socketUrl = 'https://baymore-project.onrender.com';
 
   /// OneSignal App ID — Settings > Keys & IDs sur onesignal.com (même app
   /// OneSignal que baymore_app, pour cibler les comptes staff par leur id).

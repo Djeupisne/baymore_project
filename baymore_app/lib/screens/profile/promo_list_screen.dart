@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../l10n/app_strings.dart';
 import '../../services/promo_service.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/formatters.dart';
@@ -21,18 +22,19 @@ class _PromoListScreenState extends State<PromoListScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Bons de réduction')),
+      appBar: AppBar(title: Text(strings.t('promoCodesTitle'))),
       body: FutureBuilder<List<Map<String, dynamic>>>(
         future: _future,
         builder: (context, snap) {
           if (!snap.hasData) return const Center(child: CircularProgressIndicator());
           final codes = snap.data!;
           if (codes.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.confirmation_number_outlined,
-              title: 'Aucun code actif pour le moment',
-              message: 'Revenez bientôt — de nouvelles offres arrivent régulièrement.',
+              title: strings.t('noPromoCodes'),
+              message: strings.t('noPromoCodesMsg'),
             );
           }
           return ListView.builder(
@@ -59,7 +61,7 @@ class _PromoListScreenState extends State<PromoListScreen> {
                       ),
                       if (c['minOrder'] != null) ...[
                         const SizedBox(height: 4),
-                        Text('Dès ${Formatters.cfa(c['minOrder'])} d\'achat', style: const TextStyle(color: Colors.white, fontSize: 11)),
+                        Text(strings.tf('fromAmount', [Formatters.cfa(c['minOrder'])]), style: const TextStyle(color: Colors.white, fontSize: 11)),
                       ],
                       if ((c['description'] as String?)?.isNotEmpty == true) ...[
                         const SizedBox(height: 4),

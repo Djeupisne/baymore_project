@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_strings.dart';
 import '../../models/app_address.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/address_service.dart';
@@ -29,15 +30,16 @@ class _AddressesScreenState extends State<AddressesScreen> {
   @override
   Widget build(BuildContext context) {
     final uid = context.watch<AuthProvider>().uid;
-    if (uid == null) return const Scaffold(body: Center(child: Text('Connectez-vous')));
+    final strings = AppStrings.of(context);
+    if (uid == null) return Scaffold(body: Center(child: Text(strings.loginRequired)));
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mes adresses')),
+      appBar: AppBar(title: Text(strings.myAddresses)),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: AppColors.ink,
         icon: const Icon(Icons.add),
-        label: const Text('Ajouter'),
-        onPressed: () => _openForm(context),
+        label: Text(strings.actionAdd),
+        onPressed: () => _openForm(context, strings),
       ),
       body: FutureBuilder<List<AppAddress>>(
         future: _future,
@@ -45,10 +47,10 @@ class _AddressesScreenState extends State<AddressesScreen> {
           if (!snap.hasData) return const Center(child: CircularProgressIndicator());
           final addresses = snap.data!;
           if (addresses.isEmpty) {
-            return const EmptyState(
+            return EmptyState(
               icon: Icons.location_on_outlined,
-              title: 'Aucune adresse enregistrée',
-              message: 'Ajoutez votre adresse pour commander plus rapidement la prochaine fois.',
+              title: strings.t('noAddresses'),
+              message: strings.t('noAddressesMsg'),
             );
           }
           return ListView.builder(
@@ -72,7 +74,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                             decoration: BoxDecoration(color: AppColors.ivory, borderRadius: BorderRadius.circular(20)),
-                            child: const Text('Par défaut', style: TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: AppColors.goldDeep)),
+                            child: Text(strings.t('defaultAddress'), style: const TextStyle(fontSize: 9, fontWeight: FontWeight.w700, color: AppColors.goldDeep)),
                           ),
                         ],
                       ]),
@@ -83,12 +85,12 @@ class _AddressesScreenState extends State<AddressesScreen> {
                   PopupMenuButton<String>(
                     icon: const Icon(Icons.more_vert, size: 18, color: AppColors.muted),
                     onSelected: (v) async {
-                      if (v == 'edit') _openForm(context, existing: a);
+                      if (v == 'edit') _openForm(context, strings, existing: a);
                       if (v == 'delete') { await _service.delete(a.id); _reload(); }
                     },
-                    itemBuilder: (_) => const [
-                      PopupMenuItem(value: 'edit', child: Text('Modifier')),
-                      PopupMenuItem(value: 'delete', child: Text('Supprimer')),
+                    itemBuilder: (_) => [
+                      PopupMenuItem(value: 'edit', child: Text(strings.actionEdit)),
+                      PopupMenuItem(value: 'delete', child: Text(strings.actionDelete)),
                     ],
                   ),
                 ]),
@@ -100,7 +102,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
     );
   }
 
-  void _openForm(BuildContext context, {AppAddress? existing}) {
+  void _openForm(BuildContext context, AppStrings strings, {AppAddress? existing}) {
     final labelCtrl = TextEditingController(text: existing?.label ?? '');
     final addressCtrl = TextEditingController(text: existing?.fullAddress ?? '');
     bool isDefault = existing?.isDefault ?? false;
@@ -117,16 +119,16 @@ class _AddressesScreenState extends State<AddressesScreen> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(existing == null ? 'Nouvelle adresse' : 'Modifier l\'adresse',
+              Text(existing == null ? strings.t('newAddress') : strings.t('editAddress'),
                   style: const TextStyle(fontFamily: 'Fraunces', fontSize: 17, fontWeight: FontWeight.w600)),
               const SizedBox(height: 16),
-              TextField(controller: labelCtrl, decoration: const InputDecoration(labelText: 'Nom (ex. Maison, Bureau)')),
+              TextField(controller: labelCtrl, decoration: InputDecoration(labelText: strings.t('addressName'))),
               const SizedBox(height: 12),
-              TextField(controller: addressCtrl, maxLines: 2, decoration: const InputDecoration(labelText: 'Adresse complète, quartier, repère')),
+              TextField(controller: addressCtrl, maxLines: 2, decoration: InputDecoration(labelText: strings.t('fullAddress'))),
               const SizedBox(height: 8),
               CheckboxListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Adresse par défaut', style: TextStyle(fontSize: 13)),
+                title: Text(strings.t('setAsDefault'), style: const TextStyle(fontSize: 13)),
                 value: isDefault,
                 onChanged: (v) => setModalState(() => isDefault = v ?? false),
                 controlAffinity: ListTileControlAffinity.leading,
@@ -151,7 +153,7 @@ class _AddressesScreenState extends State<AddressesScreen> {
                     if (context.mounted) Navigator.pop(context);
                     _reload();
                   },
-                  child: const Text('Enregistrer'),
+                  child: Text(strings.actionSave),
                 ),
               ),
             ],

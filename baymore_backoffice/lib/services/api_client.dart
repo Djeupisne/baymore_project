@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:dio/dio.dart';
 import '../config/api_config.dart';
 import 'token_storage.dart';
@@ -18,15 +19,26 @@ class ApiClient {
   bool _refreshing = false;
 
   ApiClient._internal() {
-    _dio = Dio(BaseOptions(baseUrl: ApiConfig.baseUrl, connectTimeout: const Duration(seconds: 15)));
+    _dio = Dio(BaseOptions(
+      baseUrl: ApiConfig.baseUrl,
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 30),
+      headers: {'Content-Type': 'application/json'},
+    ));
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         final token = await TokenStorage.accessToken;
         if (token != null) options.headers['Authorization'] = 'Bearer $token';
+        print('📤 Requête: ${options.method} ${options.path}');
         handler.next(options);
       },
+      onResponse: (response, handler) {
+        print('📥 Réponse: ${response.statusCode} ${response.requestOptions.path}');
+        handler.next(response);
+      },
       onError: (error, handler) async {
+        print('❌ Erreur: ${error.message} (status: ${error.response?.statusCode})');
         final isAuthError = error.response?.statusCode == 401;
         final isRefreshCall = error.requestOptions.path.contains('/auth/refresh');
         if (isAuthError && !isRefreshCall && !_refreshing) {
@@ -80,10 +92,36 @@ class ApiClient {
   Future<Map<String, dynamic>> _request(Future<Response> Function() call) async {
     try {
       final response = await call();
-      return Map<String, dynamic>.from(response.data ?? {});
+      print('✅ Succès: ${response.statusCode}');
+
+      if (response.data is Map) {
+        return Map<String, dynamic>.from(response.data as Map);
+      } else if (response.data is String) {
+        try {
+          final parsed = jsonDecode(response.data as String);
+          if (parsed is Map) {
+            return Map<String, dynamic>.from(parsed);
+          }
+          return {'data': parsed};
+        } catch (_) {
+          return {'data': response.data};
+        }
+      }
+      return {};
     } on DioException catch (e) {
-      final message = e.response?.data is Map ? (e.response?.data['error'] ?? 'Une erreur est survenue.') : "Impossible de contacter le serveur. Vérifiez votre connexion.";
+      print('❌ DioException: ${e.message}');
+      String message = "Impossible de contacter le serveur. Vérifiez votre connexion.";
+      if (e.response?.data != null) {
+        if (e.response!.data is Map) {
+          message = e.response!.data['error'] ?? message;
+        } else if (e.response!.data is String) {
+          message = e.response!.data as String;
+        }
+      }
       throw ApiException(message, statusCode: e.response?.statusCode);
+    } catch (e) {
+      print('❌ Erreur inattendue: $e');
+      throw ApiException('Une erreur inattendue est survenue.');
     }
   }
 }

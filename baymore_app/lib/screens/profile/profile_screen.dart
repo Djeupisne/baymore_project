@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../l10n/app_strings.dart';
 import '../../providers/auth_provider.dart';
+import '../../services/order_service.dart';
 import '../../theme/app_colors.dart';
+import '../../utils/formatters.dart';
 import '../auth/login_screen.dart';
 import '../auth/register_screen.dart';
 import '../legal/privacy_screen.dart';
@@ -15,12 +18,51 @@ import 'promo_list_screen.dart';
 import 'settings_screen.dart';
 import 'wallet_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final _orderService = OrderService();
+  int? _orderCount;
+  String? _lastLoadedUid;
+
+  Future<void> _loadOrderCount() async {
+    try {
+      final results = await Future.wait([
+        _orderService.fetchMine(active: true),
+        _orderService.fetchMine(active: false),
+      ]);
+      if (mounted) setState(() => _orderCount = results[0].length + results[1].length);
+    } catch (_) {
+      if (mounted) setState(() => _orderCount = null);
+    }
+  }
+
+  /// Recharge le profil et le nombre de commandes dès que le compte
+  /// connecté change (ou à la première ouverture de l'onglet) — le widget
+  /// reste vivant en permanence dans l'IndexedStack de la navigation, donc
+  /// initState() seul ne suffit pas : sans ce suivi du uid, un changement de
+  /// compte dans la même session laisserait affichées les données du
+  /// compte précédent.
+  void _syncForCurrentAccount(AuthProvider auth) {
+    if (auth.uid == _lastLoadedUid) return;
+    _lastLoadedUid = auth.uid;
+    _orderCount = null; // mutation directe (pas de setState pendant build)
+    if (auth.uid == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      auth.refreshProfile();
+      _loadOrderCount();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final strings = AppStrings.of(context);
+    _syncForCurrentAccount(auth);
 
     if (!auth.isLoggedIn) {
       return Scaffold(
@@ -30,16 +72,16 @@ class ProfileScreen extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text('Connectez-vous à votre compte', style: Theme.of(context).textTheme.displayMedium, textAlign: TextAlign.center),
+                Text(strings.t('loginPrompt'), style: Theme.of(context).textTheme.displayMedium, textAlign: TextAlign.center),
                 const SizedBox(height: 8),
-                const Text('Accédez à vos commandes, vos points fidélité et votre portefeuille.',
-                    textAlign: TextAlign.center, style: TextStyle(color: AppColors.muted, fontSize: 12.5)),
+                Text(strings.t('loginPromptMsg'),
+                    textAlign: TextAlign.center, style: const TextStyle(color: AppColors.muted, fontSize: 12.5)),
                 const SizedBox(height: 20),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoginScreen())),
-                    child: const Text('Se connecter'),
+                    child: Text(strings.login),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -47,7 +89,7 @@ class ProfileScreen extends StatelessWidget {
                   width: double.infinity,
                   child: OutlinedButton(
                     onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const RegisterScreen())),
-                    child: const Text('Créer un compte'),
+                    child: Text(strings.t('authCreateAccount')),
                   ),
                 ),
               ],
@@ -87,25 +129,25 @@ class ProfileScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Row(children: [
-                  _stat('${profile?.loyaltyPoints ?? 0}', 'Points fidélité'),
+                  _stat('${profile?.loyaltyPoints ?? 0}', strings.loyaltyPoints),
                   const SizedBox(width: 10),
-                  _stat('—', 'Commandes'),
+                  _stat(_orderCount != null ? '$_orderCount' : '—', strings.orders),
                   const SizedBox(width: 10),
-                  _stat('0 F', 'Solde compte'),
+                  _stat(Formatters.cfa(profile?.walletBalance ?? 0), strings.accountBalance),
                 ]),
               ),
             ),
             _sectionTitle('Général'),
             _group([
               _row(context, Icons.person_outline, 'Modifier le profil', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const EditProfileScreen()))),
-              _row(context, Icons.location_on_outlined, 'Mes adresses', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressesScreen()))),
-              _row(context, Icons.settings_outlined, 'Paramètres', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()))),
+              _row(context, Icons.location_on_outlined, strings.myAddresses, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const AddressesScreen()))),
+              _row(context, Icons.settings_outlined, strings.settings, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SettingsScreen()))),
             ]),
             _sectionTitle('Activité promotionnelle'),
             _group([
               _row(context, Icons.confirmation_number_outlined, 'Bons de réduction', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PromoListScreen()))),
               _row(context, Icons.star_border, 'Points fidélité (${profile?.loyaltyPoints ?? 0})', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const LoyaltyScreen()))),
-              _row(context, Icons.account_balance_wallet_outlined, 'Mon portefeuille', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletScreen()))),
+              _row(context, Icons.account_balance_wallet_outlined, strings.myWallet, onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletScreen()))),
             ]),
             _sectionTitle('Gagnez avec Baymore'),
             _group([
@@ -113,7 +155,7 @@ class ProfileScreen extends StatelessWidget {
             ]),
             _sectionTitle('Aide et assistance'),
             _group([
-              _row(context, Icons.chat_bubble_outline, 'Contacter la boutique (WhatsApp)', onTap: () => _openWhatsApp()),
+              _row(context, Icons.chat_bubble_outline, strings.contactShop, onTap: () => _openWhatsApp()),
               _row(context, Icons.description_outlined, 'Conditions générales', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TermsScreen()))),
               _row(context, Icons.privacy_tip_outlined, 'Politique de confidentialité', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyScreen()))),
             ]),
@@ -123,7 +165,7 @@ class ProfileScreen extends StatelessWidget {
               child: OutlinedButton.icon(
                 onPressed: () => context.read<AuthProvider>().logout(),
                 icon: const Icon(Icons.logout, color: AppColors.danger, size: 18),
-                label: const Text('Déconnexion', style: TextStyle(color: AppColors.danger, fontWeight: FontWeight.w700)),
+                label: Text(strings.logout, style: const TextStyle(color: AppColors.danger, fontWeight: FontWeight.w700)),
                 style: OutlinedButton.styleFrom(side: const BorderSide(color: AppColors.danger)),
               ),
             ),

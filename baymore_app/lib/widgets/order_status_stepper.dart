@@ -62,14 +62,14 @@ class OrderStatusStepper extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_steps[i].label,
+                      Text(_steps[i].labelFor(context),
                           style: TextStyle(
                               fontWeight: FontWeight.w700,
                               fontSize: 13.5,
                               color: done ? AppColors.ink : AppColors.muted)),
                       const SizedBox(height: 3),
                       if (i == currentIndex)
-                        Text(_steps[i].description,
+                        Text(_steps[i].descriptionFor(context),
                             style: const TextStyle(fontSize: 11.5, color: AppColors.muted, height: 1.4)),
                     ],
                   ),

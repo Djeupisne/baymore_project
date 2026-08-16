@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_strings.dart';
 import '../../models/product.dart';
 import '../../providers/favorites_provider.dart';
 import '../../services/product_service.dart';
@@ -25,14 +26,15 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   @override
   Widget build(BuildContext context) {
     final favIds = context.watch<FavoritesProvider>().favoriteIds;
+    final strings = AppStrings.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Favoris')),
+      appBar: AppBar(title: Text(strings.t('favoritesTitle'))),
       body: favIds.isEmpty
-          ? const EmptyState(
+          ? EmptyState(
               icon: Icons.favorite_border,
-              title: 'Aucun favori pour l\'instant',
-              message: "Touchez le cœur sur un article pour le retrouver ici plus tard.",
+              title: strings.t('noFavoritesTitle'),
+              message: strings.t('noFavoritesMsg'),
             )
           : FutureBuilder<List<Product>>(
               future: _future,
@@ -40,7 +42,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
                 if (!snap.hasData) return const Center(child: CircularProgressIndicator());
                 final favProducts = snap.data!.where((p) => favIds.contains(p.id)).toList();
                 if (favProducts.isEmpty) {
-                  return const EmptyState(icon: Icons.favorite_border, title: 'Aucun favori pour l\'instant', message: 'Vos articles favoris apparaîtront ici.');
+                  return EmptyState(icon: Icons.favorite_border, title: strings.t('noFavoritesTitle'), message: strings.t('favoritesWillAppear'));
                 }
                 return GridView.builder(
                   padding: const EdgeInsets.all(20),

@@ -30,4 +30,16 @@ extension OrderStatusX on OrderStatus {
       default: return null;
     }
   }
+
+  /// Conversion inverse vers le format attendu par le backend — utilisée
+  /// pour envoyer le nouveau statut lors d'un PATCH /orders/:id/status.
+  String get toApiString {
+    switch (this) {
+      case OrderStatus.enAttente: return 'EN_ATTENTE';
+      case OrderStatus.priseEnCharge: return 'PRIS_EN_CHARGE';
+      case OrderStatus.enRoute: return 'EN_ROUTE';
+      case OrderStatus.livree: return 'LIVRE';
+      case OrderStatus.annulee: return 'ANNULE';
+    }
+  }
 }

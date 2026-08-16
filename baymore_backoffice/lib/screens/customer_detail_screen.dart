@@ -67,7 +67,7 @@ class CustomerDetailScreen extends StatelessWidget {
                   child: Row(children: [
                     Expanded(
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text('#${o.id.substring(0, 6).toUpperCase()}', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
+                        Text('#${(o.id.length >= 6 ? o.id.substring(0, 6) : o.id).toUpperCase()}', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
                         Text(DateFormat('dd MMM yyyy, HH:mm', 'fr_FR').format(o.createdAt), style: const TextStyle(fontSize: 11, color: AppColors.muted)),
                       ]),
                     ),

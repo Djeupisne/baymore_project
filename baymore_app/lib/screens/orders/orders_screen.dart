@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_strings.dart';
 import '../../models/order.dart';
 import '../../models/order_status.dart';
 import '../../providers/auth_provider.dart';
@@ -22,12 +23,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   final _service = OrderService();
   bool _reordering = false;
   Future<List<AppOrder>>? _future;
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _future ??= _load();
-  }
+  String? _lastUid;
 
   Future<List<AppOrder>> _load() => _service.fetchMine(active: _showActive);
 
@@ -69,6 +65,15 @@ class _OrdersScreenState extends State<OrdersScreen> {
   @override
   Widget build(BuildContext context) {
     final uid = context.watch<AuthProvider>().uid;
+    // Le widget reste vivant en permanence dans l'IndexedStack de la
+    // navigation : sans ce suivi du uid, un changement de compte dans la
+    // même session laisserait affichée la liste de commandes du compte
+    // précédent (didChangeDependencies ne recharge qu'une seule fois).
+    if (uid != _lastUid || _future == null) {
+      _lastUid = uid;
+      _future = _load();
+    }
+    final strings = AppStrings.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -76,7 +81,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
-              child: Text('Mes commandes', style: Theme.of(context).textTheme.displayMedium),
+              child: Text(strings.myOrders, style: Theme.of(context).textTheme.displayMedium),
             ),
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
@@ -92,7 +97,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         border: Border.all(color: AppColors.line),
                         borderRadius: const BorderRadius.horizontal(left: Radius.circular(22)),
                       ),
-                      child: Text('En cours', style: TextStyle(color: _showActive ? Colors.white : AppColors.ink, fontWeight: FontWeight.w700, fontSize: 12.5)),
+                      child: Text(strings.tabActive, style: TextStyle(color: _showActive ? Colors.white : AppColors.ink, fontWeight: FontWeight.w700, fontSize: 12.5)),
                     ),
                   ),
                 ),
@@ -107,7 +112,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         border: Border.all(color: AppColors.line),
                         borderRadius: const BorderRadius.horizontal(right: Radius.circular(22)),
                       ),
-                      child: Text('Historique', style: TextStyle(color: !_showActive ? Colors.white : AppColors.ink, fontWeight: FontWeight.w700, fontSize: 12.5)),
+                      child: Text(strings.tabHistory, style: TextStyle(color: !_showActive ? Colors.white : AppColors.ink, fontWeight: FontWeight.w700, fontSize: 12.5)),
                     ),
                   ),
                 ),
@@ -115,7 +120,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
             ),
             Expanded(
               child: uid == null
-                  ? const EmptyState(icon: Icons.receipt_long_outlined, title: 'Connectez-vous', message: 'Créez un compte pour suivre vos commandes.')
+                  ? EmptyState(icon: Icons.receipt_long_outlined, title: strings.loginToTrack, message: strings.loginToTrackMsg)
                   : RefreshIndicator(
                       onRefresh: () async { setState(() => _future = _load()); await _future; },
                       child: FutureBuilder<List<AppOrder>>(
@@ -126,10 +131,8 @@ class _OrdersScreenState extends State<OrdersScreen> {
                         if (orders.isEmpty) {
                           return EmptyState(
                             icon: Icons.receipt_long_outlined,
-                            title: _showActive ? 'Aucune commande en cours' : 'Aucun historique',
-                            message: _showActive
-                                ? 'Vos achats en préparation ou en livraison apparaîtront ici.'
-                                : 'Vos commandes livrées apparaîtront ici.',
+                            title: _showActive ? strings.noActiveOrders : strings.noHistory,
+                            message: _showActive ? strings.noActiveOrdersMsg : strings.noHistoryMsg,
                           );
                         }
                         return ListView.separated(
@@ -145,17 +148,17 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                 decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: AppColors.line)),
                                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                                   Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                                    Text('Commande #${o.id.substring(0, 6).toUpperCase()}', style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
+                                    Text(strings.tf('orderNumber', [o.id.substring(0, 6).toUpperCase()]), style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
                                     Container(
                                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                       decoration: BoxDecoration(color: AppColors.ivory, borderRadius: BorderRadius.circular(20)),
-                                      child: Text(o.status.label, style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.goldDeep)),
+                                      child: Text(o.status.labelFor(context), style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w700, color: AppColors.goldDeep)),
                                     ),
                                   ]),
                                   const SizedBox(height: 6),
                                   Text(Formatters.shortDate(o.createdAt), style: const TextStyle(fontSize: 11, color: AppColors.muted)),
                                   const SizedBox(height: 10),
-                                  Text('${o.items.length} article(s) · ${o.deliveryMode.label}', style: const TextStyle(fontSize: 12)),
+                                  Text('${o.items.length} article(s) · ${o.deliveryMode.labelFor(context)}', style: const TextStyle(fontSize: 12)),
                                   const SizedBox(height: 6),
                                   Text(Formatters.cfa(o.total), style: const TextStyle(fontFamily: 'Fraunces', fontWeight: FontWeight.w700, fontSize: 14)),
                                   if (o.status == OrderStatus.livree) ...[
@@ -165,7 +168,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
                                       child: OutlinedButton.icon(
                                         onPressed: () => _reorder(context, o),
                                         icon: const Icon(Icons.replay, size: 16),
-                                        label: const Text('Recommander'),
+                                        label: Text(strings.t('reorder')),
                                       ),
                                     ),
                                   ],

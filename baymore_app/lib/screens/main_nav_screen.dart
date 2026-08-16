@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../l10n/app_strings.dart';
 import '../providers/cart_provider.dart';
 import '../theme/app_colors.dart';
 import 'cart/cart_screen.dart';
@@ -30,6 +31,7 @@ class _MainNavScreenState extends State<MainNavScreen> {
   @override
   Widget build(BuildContext context) {
     final cartCount = context.watch<CartProvider>().itemCount;
+    final strings = AppStrings.of(context);
 
     return Scaffold(
       body: IndexedStack(index: _index, children: _screens),
@@ -37,8 +39,8 @@ class _MainNavScreenState extends State<MainNavScreen> {
         currentIndex: _index,
         onTap: (i) => setState(() => _index = i),
         items: [
-          const BottomNavigationBarItem(icon: Icon(Icons.storefront_outlined), activeIcon: Icon(Icons.storefront), label: 'Boutique'),
-          const BottomNavigationBarItem(icon: Icon(Icons.favorite_border), activeIcon: Icon(Icons.favorite), label: 'Favoris'),
+          BottomNavigationBarItem(icon: const Icon(Icons.storefront_outlined), activeIcon: const Icon(Icons.storefront), label: strings.navShop),
+          BottomNavigationBarItem(icon: const Icon(Icons.favorite_border), activeIcon: const Icon(Icons.favorite), label: strings.navFavorites),
           BottomNavigationBarItem(
             icon: Container(
               width: 46, height: 46,
@@ -59,8 +61,8 @@ class _MainNavScreenState extends State<MainNavScreen> {
             ),
             label: '',
           ),
-          const BottomNavigationBarItem(icon: Icon(Icons.receipt_long_outlined), activeIcon: Icon(Icons.receipt_long), label: 'Commandes'),
-          const BottomNavigationBarItem(icon: Icon(Icons.menu), label: 'Menu'),
+          BottomNavigationBarItem(icon: const Icon(Icons.receipt_long_outlined), activeIcon: const Icon(Icons.receipt_long), label: strings.navOrders),
+          BottomNavigationBarItem(icon: const Icon(Icons.menu), label: strings.navMenu),
         ],
       ),
     );

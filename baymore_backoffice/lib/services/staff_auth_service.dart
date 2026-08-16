@@ -13,9 +13,6 @@ class StaffUser {
       StaffUser(id: json['id'], name: json['name'] ?? '', email: json['email'] ?? '');
 }
 
-/// Authentifie un membre de l'équipe via le backend Baymore. Le serveur
-/// vérifie lui-même que le compte a bien le rôle STAFF (voir POST
-/// /auth/staff/login) — refuse toute connexion cliente ici.
 class StaffAuthService {
   static final StaffAuthService _instance = StaffAuthService._internal();
   factory StaffAuthService() => _instance;
@@ -35,10 +32,17 @@ class StaffAuthService {
     try {
       final data = await _api.get('/auth/me');
       final user = StaffUser.fromJson(data['user']);
-      await OneSignal.login(user.id);
-      SocketService().joinStaffRoom();
+
+      try {
+        await OneSignal.login(user.id);
+        SocketService().joinStaffRoom();
+      } catch (e) {
+        print('⚠️ OneSignal non disponible: $e');
+      }
+
       _authController.add(user);
-    } on ApiException {
+    } catch (e) {
+      print('❌ Erreur restoreSession: $e');
       await TokenStorage.clear();
       _authController.add(null);
     }
@@ -46,20 +50,51 @@ class StaffAuthService {
 
   Future<String?> login(String email, String password) async {
     try {
+      print('🔑 Tentative de connexion pour: $email');
       final data = await _api.post('/auth/staff/login', data: {'email': email, 'password': password});
-      await TokenStorage.save(accessToken: data['accessToken'], refreshToken: data['refreshToken']);
+      print('✅ Données reçues: $data');
+
+      final accessToken = data['accessToken'];
+      final refreshToken = data['refreshToken'];
+
+      if (accessToken == null || refreshToken == null) {
+        print('❌ Tokens manquants dans la réponse!');
+        return null;
+      }
+
+      await TokenStorage.save(accessToken: accessToken, refreshToken: refreshToken);
       final user = StaffUser.fromJson(data['user']);
-      await OneSignal.login(user.id);
-      SocketService().joinStaffRoom();
+      print('👤 Utilisateur: ${user.email} (${user.name})');
+
+      try {
+        await OneSignal.login(user.id);
+        SocketService().joinStaffRoom();
+      } catch (e) {
+        print('⚠️ OneSignal non disponible: $e');
+      }
+
       _authController.add(user);
       return user.name;
-    } on ApiException {
+    } on ApiException catch (e) {
+      print('❌ ApiException: ${e.message} (status: ${e.statusCode})');
+      return null;
+    } catch (e) {
+      print('❌ Erreur inconnue: $e');
       return null;
     }
   }
 
   Future<void> logout() async {
-    await OneSignal.logout();
+    try {
+      await OneSignal.logout();
+    } catch (e) {
+      print('⚠️ OneSignal non disponible: $e');
+    }
+    await TokenStorage.clear();
+    _authController.add(null);
+  }
+
+  Future<void> clearSession() async {
     await TokenStorage.clear();
     _authController.add(null);
   }

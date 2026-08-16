@@ -4,6 +4,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:intl/intl.dart';
 import '../models/order.dart';
 import '../models/order_status.dart';
+import '../services/api_client.dart';
 import '../services/order_service.dart';
 import '../services/socket_service.dart';
 import '../theme/app_colors.dart';
@@ -19,6 +20,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
   OrderStatus? _filter;
   List<AppOrder> _orders = [];
   bool _loading = true;
+  String? _error;
 
   StreamSubscription? _newOrderSub;
   StreamSubscription? _updateOrderSub;
@@ -33,10 +35,12 @@ class _OrdersScreenState extends State<OrdersScreen> {
     final socket = SocketService().socket;
     _newOrderSub = _listen(socket, 'order:new', (data) {
       final order = AppOrder.fromJson(Map<String, dynamic>.from(data));
-      setState(() => _orders = [order, ..._orders]);
+      if (!mounted) return;
+      setState(() => _orders = [order, ..._orders.where((o) => o.id != order.id)]);
     });
     _updateOrderSub = _listen(socket, 'order:update', (data) {
       final updated = AppOrder.fromJson(Map<String, dynamic>.from(data));
+      if (!mounted) return;
       setState(() => _orders = _orders.map((o) => o.id == updated.id ? updated : o).toList());
     });
   }
@@ -47,9 +51,23 @@ class _OrdersScreenState extends State<OrdersScreen> {
   }
 
   Future<void> _load() async {
-    setState(() => _loading = true);
-    final orders = await _service.fetchAll();
-    setState(() { _orders = orders; _loading = false; });
+    setState(() { _loading = true; _error = null; });
+    try {
+      final orders = await _service.fetchAll();
+      if (!mounted) return;
+      setState(() { _orders = orders; _loading = false; });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() { _loading = false; _error = e is ApiException ? e.message : 'Impossible de charger les commandes.'; });
+    }
+  }
+
+  /// Applique localement le nouveau statut sans attendre l'écho du socket,
+  /// pour que l'écran réagisse instantanément même si la diffusion en
+  /// direct est en retard ou indisponible.
+  void _applyLocalUpdate(String orderId, AppOrder Function(AppOrder) update) {
+    if (!mounted) return;
+    setState(() => _orders = _orders.map((o) => o.id == orderId ? update(o) : o).toList());
   }
 
   @override
@@ -79,30 +97,65 @@ class _OrdersScreenState extends State<OrdersScreen> {
         Expanded(
           child: _loading
               ? const Center(child: CircularProgressIndicator())
-              : orders.isEmpty
-                  ? const Center(child: Text('Aucune commande', style: TextStyle(color: AppColors.muted)))
-                  : RefreshIndicator(
-                      onRefresh: _load,
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
-                        itemCount: orders.length,
-                        itemBuilder: (context, i) => _OrderCard(order: orders[i], service: _service),
-                      ),
-                    ),
+              : _error != null
+                  ? _ErrorState(message: _error!, onRetry: _load)
+                  : orders.isEmpty
+                      ? RefreshIndicator(
+                          onRefresh: _load,
+                          child: ListView(children: const [
+                            SizedBox(height: 120),
+                            Center(child: Text('Aucune commande', style: TextStyle(color: AppColors.muted))),
+                          ]),
+                        )
+                      : RefreshIndicator(
+                          onRefresh: _load,
+                          child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            itemCount: orders.length,
+                            itemBuilder: (context, i) => _OrderCard(
+                              order: orders[i],
+                              service: _service,
+                              onLocalUpdate: _applyLocalUpdate,
+                            ),
+                          ),
+                        ),
         ),
       ],
     );
   }
 
   Widget _chip(OrderStatus? status, String label) {
+    final count = status == null ? _orders.length : _orders.where((o) => o.status == status).length;
     final selected = _filter == status;
     return ChoiceChip(
-      label: Text(label),
+      label: Text(count > 0 ? '$label ($count)' : label),
       selected: selected,
       onSelected: (_) => setState(() => _filter = status),
       selectedColor: AppColors.ink,
       labelStyle: TextStyle(color: selected ? Colors.white : AppColors.ink, fontWeight: FontWeight.w700, fontSize: 12),
       backgroundColor: Colors.white,
+    );
+  }
+}
+
+class _ErrorState extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+  const _ErrorState({required this.message, required this.onRetry});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          const Icon(Icons.wifi_off_rounded, color: AppColors.muted, size: 36),
+          const SizedBox(height: 12),
+          Text(message, textAlign: TextAlign.center, style: const TextStyle(color: AppColors.muted, fontSize: 13)),
+          const SizedBox(height: 14),
+          OutlinedButton(onPressed: onRetry, child: const Text('Réessayer')),
+        ]),
+      ),
     );
   }
 }
@@ -138,13 +191,15 @@ class _SocketOffSubscription implements StreamSubscription<dynamic> {
 class _OrderCard extends StatefulWidget {
   final AppOrder order;
   final OrderService service;
-  const _OrderCard({required this.order, required this.service});
+  final void Function(String orderId, AppOrder Function(AppOrder) update) onLocalUpdate;
+  const _OrderCard({required this.order, required this.service, required this.onLocalUpdate});
   @override
   State<_OrderCard> createState() => _OrderCardState();
 }
 
 class _OrderCardState extends State<_OrderCard> {
   bool _busy = false;
+  bool _cancelling = false;
   bool _sharingLocation = false;
   StreamSubscription<Position>? _positionSub;
 
@@ -174,6 +229,13 @@ class _OrderCardState extends State<_OrderCard> {
     );
     if (ok == true && nameCtrl.text.trim().isNotEmpty) {
       await widget.service.assignDriver(widget.order.id, nameCtrl.text.trim(), phoneCtrl.text.trim());
+      widget.onLocalUpdate(widget.order.id, (o) => AppOrder(
+            id: o.id, userId: o.userId, items: o.items, total: o.total, deliveryMode: o.deliveryMode,
+            deliveryAddress: o.deliveryAddress, paymentMethod: o.paymentMethod, paymentStatus: o.paymentStatus,
+            status: o.status, driverName: nameCtrl.text.trim(), driverPhone: phoneCtrl.text.trim(), createdAt: o.createdAt,
+          ));
+    } else {
+      throw _CancelledException();
     }
   }
 
@@ -186,9 +248,56 @@ class _OrderCardState extends State<_OrderCard> {
         await _showAssignDriverDialog();
       }
       await widget.service.advanceStatus(widget.order.id, next);
+      widget.onLocalUpdate(widget.order.id, (o) => AppOrder(
+            id: o.id, userId: o.userId, items: o.items, total: o.total, deliveryMode: o.deliveryMode,
+            deliveryAddress: o.deliveryAddress, paymentMethod: o.paymentMethod, paymentStatus: o.paymentStatus,
+            status: next, driverName: o.driverName, driverPhone: o.driverPhone, createdAt: o.createdAt,
+          ));
+    } on _CancelledException {
+      // L'utilisateur a fermé la boîte de dialogue "Assigner un livreur" sans valider.
+    } catch (e) {
+      _showError(e);
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+  }
+
+  Future<void> _cancel() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Annuler la commande'),
+        content: const Text('Confirmer l\'annulation de cette commande ?'),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Non')),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
+            child: const Text('Oui, annuler'),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true) return;
+    setState(() => _cancelling = true);
+    try {
+      await widget.service.cancel(widget.order.id);
+      widget.onLocalUpdate(widget.order.id, (o) => AppOrder(
+            id: o.id, userId: o.userId, items: o.items, total: o.total, deliveryMode: o.deliveryMode,
+            deliveryAddress: o.deliveryAddress, paymentMethod: o.paymentMethod, paymentStatus: o.paymentStatus,
+            status: OrderStatus.annulee, driverName: o.driverName, driverPhone: o.driverPhone, createdAt: o.createdAt,
+          ));
+    } catch (e) {
+      _showError(e);
+    } finally {
+      if (mounted) setState(() => _cancelling = false);
+    }
+  }
+
+  void _showError(Object e) {
+    if (!mounted) return;
+    final message = e is ApiException ? e.message : 'Une erreur est survenue. Réessayez.';
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message), backgroundColor: AppColors.danger));
   }
 
   /// Active/désactive le partage de position en direct — à utiliser par le
@@ -242,7 +351,7 @@ class _OrderCardState extends State<_OrderCard> {
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: AppColors.line)),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Text('#${o.id.substring(0, 6).toUpperCase()}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+          Text('#${(o.id.length >= 6 ? o.id.substring(0, 6) : o.id).toUpperCase()}', style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(color: AppColors.ivory, borderRadius: BorderRadius.circular(20)),
@@ -274,9 +383,11 @@ class _OrderCardState extends State<_OrderCard> {
           if (o.status != OrderStatus.livree && o.status != OrderStatus.annulee) ...[
             const SizedBox(width: 8),
             OutlinedButton(
-              onPressed: () => widget.service.cancel(o.id),
+              onPressed: _cancelling ? null : _cancel,
               style: OutlinedButton.styleFrom(foregroundColor: AppColors.danger, side: const BorderSide(color: AppColors.danger)),
-              child: const Text('Annuler'),
+              child: _cancelling
+                  ? const SizedBox(height: 16, width: 16, child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.danger))
+                  : const Text('Annuler'),
             ),
           ],
         ]),
@@ -306,3 +417,5 @@ class _OrderCardState extends State<_OrderCard> {
     return '${o.paymentMethod == 'flooz' ? 'Flooz' : 'T-Money'} ($status)';
   }
 }
+
+class _CancelledException implements Exception {}

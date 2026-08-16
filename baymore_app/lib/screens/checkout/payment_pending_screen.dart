@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import '../../l10n/app_strings.dart';
 import '../../models/order.dart';
 import '../../services/order_service.dart';
 import '../../services/payment_service.dart';
@@ -32,8 +33,9 @@ class _PaymentPendingScreenState extends State<PaymentPendingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Paiement en cours'), automaticallyImplyLeading: false),
+      appBar: AppBar(title: Text(strings.t('paymentInProgress')), automaticallyImplyLeading: false),
       body: StreamBuilder<AppOrder?>(
         stream: OrderService().watchOrder(widget.orderId),
         builder: (context, snap) {
@@ -59,10 +61,10 @@ class _PaymentPendingScreenState extends State<PaymentPendingScreen> {
                   if (status == 'echoue') ...[
                     const Icon(Icons.error_outline, color: AppColors.danger, size: 48),
                     const SizedBox(height: 16),
-                    const Text('Le paiement a échoué', style: TextStyle(fontFamily: 'Fraunces', fontSize: 18, fontWeight: FontWeight.w600)),
+                    Text(strings.t('paymentFailed'), style: const TextStyle(fontFamily: 'Fraunces', fontSize: 18, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
-                    const Text('Vérifiez votre solde Mobile Money et réessayez, ou choisissez le paiement à la livraison.',
-                        textAlign: TextAlign.center, style: TextStyle(color: AppColors.muted, fontSize: 12.5)),
+                    Text(strings.t('paymentFailedMsg'),
+                        textAlign: TextAlign.center, style: const TextStyle(color: AppColors.muted, fontSize: 12.5)),
                     const SizedBox(height: 20),
                     SizedBox(
                       width: double.infinity,
@@ -70,7 +72,7 @@ class _PaymentPendingScreenState extends State<PaymentPendingScreen> {
                         onPressed: _retrying ? null : _retry,
                         child: _retrying
                             ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                            : const Text('Réessayer le paiement'),
+                            : Text(strings.t('retryPayment')),
                       ),
                     ),
                   ] else ...[
@@ -79,12 +81,12 @@ class _PaymentPendingScreenState extends State<PaymentPendingScreen> {
                       child: CircularProgressIndicator(strokeWidth: 2.4, color: AppColors.gold),
                     ),
                     const SizedBox(height: 20),
-                    const Text('En attente de confirmation', style: TextStyle(fontFamily: 'Fraunces', fontSize: 18, fontWeight: FontWeight.w600)),
+                    Text(strings.t('awaitingConfirmation'), style: const TextStyle(fontFamily: 'Fraunces', fontSize: 18, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 8),
-                    const Text(
-                      "Validez le paiement dans la fenêtre Flooz / T-Money qui vient de s'ouvrir. Cette page se met à jour automatiquement dès confirmation.",
+                    Text(
+                      strings.t('awaitingConfirmationMsg'),
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: AppColors.muted, fontSize: 12.5, height: 1.5),
+                      style: const TextStyle(color: AppColors.muted, fontSize: 12.5, height: 1.5),
                     ),
                   ],
                 ],

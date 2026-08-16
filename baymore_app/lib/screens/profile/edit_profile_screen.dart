@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/auth_service.dart';
-import '../../theme/app_colors.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -25,16 +25,17 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Modifier le profil')),
+      appBar: AppBar(title: Text(strings.t('editProfileTitle'))),
       body: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            TextField(controller: _name, decoration: const InputDecoration(labelText: 'Nom complet')),
+            TextField(controller: _name, decoration: InputDecoration(labelText: strings.t('authFullName'))),
             const SizedBox(height: 14),
-            TextField(controller: _phone, decoration: const InputDecoration(labelText: 'Téléphone')),
+            TextField(controller: _phone, decoration: InputDecoration(labelText: strings.t('authPhone'))),
             const SizedBox(height: 24),
             SizedBox(
               width: double.infinity,
@@ -42,7 +43,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 onPressed: _saving ? null : _save,
                 child: _saving
                     ? const SizedBox(height: 18, width: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : const Text('Enregistrer'),
+                    : Text(strings.actionSave),
               ),
             ),
           ],

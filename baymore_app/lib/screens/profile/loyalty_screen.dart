@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../theme/app_colors.dart';
 
@@ -9,8 +10,9 @@ class LoyaltyScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final profile = context.watch<AuthProvider>().profile;
+    final strings = AppStrings.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Points fidélité')),
+      appBar: AppBar(title: Text(strings.loyaltyPoints)),
       body: ListView(
         padding: const EdgeInsets.all(20),
         children: [
@@ -21,26 +23,25 @@ class LoyaltyScreen extends StatelessWidget {
               borderRadius: BorderRadius.circular(18),
             ),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('Votre solde', style: TextStyle(color: Colors.white, fontSize: 11)),
+              Text(strings.t('yourBalance'), style: const TextStyle(color: Colors.white, fontSize: 11)),
               const SizedBox(height: 6),
-              Text('${profile?.loyaltyPoints ?? 0} points', style: const TextStyle(fontFamily: 'Fraunces', color: Colors.white, fontSize: 26, fontWeight: FontWeight.w700)),
+              Text(strings.tf('pointsSuffix', ['${profile?.loyaltyPoints ?? 0}']),
+                  style: const TextStyle(fontFamily: 'Fraunces', color: Colors.white, fontSize: 26, fontWeight: FontWeight.w700)),
             ]),
           ),
           const SizedBox(height: 24),
-          const Text('Comment gagner des points ?', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
+          Text(strings.t('howToEarnPoints'), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14)),
           const SizedBox(height: 12),
-          _infoRow(Icons.shopping_bag_outlined, '1 point tous les 1 000 F CFA dépensés',
-              'Crédité automatiquement dès que votre commande est livrée.'),
+          _infoRow(Icons.shopping_bag_outlined, strings.t('earnPointsSpend'), strings.t('earnPointsSpendMsg')),
           const SizedBox(height: 10),
-          _infoRow(Icons.people_alt_outlined, '50 points par parrainage',
-              'Vous et votre filleul recevez chacun 50 points quand il utilise votre code à l\'inscription.'),
+          _infoRow(Icons.people_alt_outlined, strings.t('earnPointsReferral'), strings.t('earnPointsReferralMsg')),
           const SizedBox(height: 24),
           Container(
             padding: const EdgeInsets.all(14),
             decoration: BoxDecoration(color: AppColors.ivory, borderRadius: BorderRadius.circular(12), border: Border.all(color: AppColors.line)),
-            child: const Text(
-              "Vos points fidélité sont distincts de votre solde portefeuille (cashback) — retrouvez-le dans Profil > Mon portefeuille.",
-              style: TextStyle(fontSize: 11.5, color: AppColors.muted, height: 1.4),
+            child: Text(
+              strings.t('loyaltyWalletNote'),
+              style: const TextStyle(fontSize: 11.5, color: AppColors.muted, height: 1.4),
             ),
           ),
         ],

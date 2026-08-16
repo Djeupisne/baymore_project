@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_strings.dart';
 import '../../models/product.dart';
 import '../../providers/auth_provider.dart';
 import '../../services/product_service.dart';
@@ -8,6 +9,7 @@ import '../../widgets/product_card.dart';
 import '../product/product_detail_screen.dart';
 import 'category_products_screen.dart';
 import 'search_screen.dart';
+import '../notifications/notifications_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,6 +28,16 @@ class _HomeScreenState extends State<HomeScreen> {
     {'key': 'beaute', 'label': 'BEAUTÉ', 'color': AppColors.plum, 'icon': Icons.spa_outlined},
   ];
 
+  String _categoryLabel(String key, AppStrings strings) {
+    switch (key) {
+      case 'femme': return strings.categoryWomen;
+      case 'homme': return strings.categoryMen;
+      case 'enfant': return strings.categoryKids;
+      case 'beaute': return strings.categoryBeauty;
+      default: return key;
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -40,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final auth = context.watch<AuthProvider>();
+    final strings = AppStrings.of(context);
 
     return Scaffold(
       body: SafeArea(
@@ -62,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(width: 10),
                         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          const Text('Lomé, Togo', style: TextStyle(fontSize: 10, color: AppColors.muted)),
+                          Text(strings.t('lomeTogo'), style: const TextStyle(fontSize: 10, color: AppColors.muted)),
                           Text(
                             auth.profile != null ? 'Bonjour, ${auth.profile!.name.split(' ').first}' : 'Bienvenue chez Baymore',
                               style: const TextStyle(fontFamily: 'Fraunces', fontWeight: FontWeight.w600, fontSize: 15, color: AppColors.ink)),
@@ -77,9 +90,12 @@ class _HomeScreenState extends State<HomeScreen> {
                           ),
                         ),
                         const SizedBox(width: 8),
-                        const CircleAvatar(
-                          radius: 18, backgroundColor: Colors.white,
-                          child: Icon(Icons.notifications_none_rounded, color: AppColors.ink, size: 20),
+                        GestureDetector(
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen())),
+                          child: const CircleAvatar(
+                            radius: 18, backgroundColor: Colors.white,
+                            child: Icon(Icons.notifications_none_rounded, color: AppColors.ink, size: 20),
+                          ),
                         ),
                       ]),
                     ],
@@ -91,10 +107,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
                   child: Row(
                     children: _categories.map((c) {
+                      final label = _categoryLabel(c['key'] as String, strings);
                       return Expanded(
                         child: GestureDetector(
                           onTap: () => Navigator.push(context, MaterialPageRoute(
-                              builder: (_) => CategoryProductsScreen(categoryKey: c['key'] as String, label: c['label'] as String))),
+                              builder: (_) => CategoryProductsScreen(categoryKey: c['key'] as String, label: label))),
                           child: Container(
                             margin: const EdgeInsets.symmetric(horizontal: 4),
                             padding: const EdgeInsets.symmetric(vertical: 12),
@@ -102,7 +119,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             child: Column(children: [
                               Icon(c['icon'] as IconData, color: c['color'] as Color),
                               const SizedBox(height: 6),
-                              Text(c['label'] as String, style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700)),
+                              Text(label, style: const TextStyle(fontSize: 9.5, fontWeight: FontWeight.w700)),
                             ]),
                           ),
                         ),
@@ -120,14 +137,17 @@ class _HomeScreenState extends State<HomeScreen> {
                     borderRadius: BorderRadius.circular(18),
                   ),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Text('NOUVELLE COLLECTION', style: TextStyle(color: Colors.white, fontSize: 10, letterSpacing: 1, fontWeight: FontWeight.w700)),
+                    Text(strings.t('newCollection'), style: const TextStyle(color: Colors.white, fontSize: 10, letterSpacing: 1, fontWeight: FontWeight.w700)),
                     const SizedBox(height: 6),
                     const Text('-20% sur les sacs', style: TextStyle(fontFamily: 'Fraunces', color: Colors.white, fontSize: 19, fontWeight: FontWeight.w600)),
                     const SizedBox(height: 10),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                      decoration: BoxDecoration(color: AppColors.ink, borderRadius: BorderRadius.circular(20)),
-                      child: const Text('Découvrir', style: TextStyle(color: AppColors.ivory, fontSize: 11.5, fontWeight: FontWeight.w700)),
+                    GestureDetector(
+                      onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const SearchScreen(initialQuery: 'sac'))),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(color: AppColors.ink, borderRadius: BorderRadius.circular(20)),
+                        child: Text(strings.discover, style: const TextStyle(color: AppColors.ivory, fontSize: 11.5, fontWeight: FontWeight.w700)),
+                      ),
                     ),
                   ]),
                 ),
@@ -135,7 +155,7 @@ class _HomeScreenState extends State<HomeScreen> {
               SliverPadding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 sliver: SliverToBoxAdapter(
-                  child: Text('Recommandé pour vous', style: Theme.of(context).textTheme.titleLarge),
+                  child: Text(strings.t('recommendedForYou'), style: Theme.of(context).textTheme.titleLarge),
                 ),
               ),
               const SliverToBoxAdapter(child: SizedBox(height: 12)),
@@ -149,11 +169,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     }
                     final products = snap.data!.take(20).toList();
                     if (products.isEmpty) {
-                      return const SliverToBoxAdapter(
+                      return SliverToBoxAdapter(
                         child: Padding(
-                          padding: EdgeInsets.only(top: 30),
-                          child: Text('Le catalogue est en cours de préparation. Revenez bientôt !',
-                              style: TextStyle(color: AppColors.muted, fontSize: 12)),
+                          padding: const EdgeInsets.only(top: 30),
+                          child: Text(strings.t('catalogPreparing'),
+                              style: const TextStyle(color: AppColors.muted, fontSize: 12)),
                         ),
                       );
                     }

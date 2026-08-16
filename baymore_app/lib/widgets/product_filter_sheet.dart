@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_strings.dart';
 import '../models/product.dart';
 import '../models/product_filters.dart';
 import '../theme/app_colors.dart';
@@ -62,6 +63,7 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return Padding(
       padding: EdgeInsets.fromLTRB(20, 20, 20, MediaQuery.of(context).viewInsets.bottom + 20),
       child: SingleChildScrollView(
@@ -69,18 +71,18 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-              const Text('Filtrer', style: TextStyle(fontFamily: 'Fraunces', fontSize: 18, fontWeight: FontWeight.w600)),
+              Text(strings.t('filterTitle'), style: const TextStyle(fontFamily: 'Fraunces', fontSize: 18, fontWeight: FontWeight.w600)),
               TextButton(
                 onPressed: () => setState(() {
                   _priceRange = RangeValues(widget.minBound, widget.maxBound);
                   _sizes.clear();
                   _colors.clear();
                 }),
-                child: const Text('Réinitialiser', style: TextStyle(color: AppColors.goldDeep, fontWeight: FontWeight.w700, fontSize: 12)),
+                child: Text(strings.t('filterReset'), style: const TextStyle(color: AppColors.goldDeep, fontWeight: FontWeight.w700, fontSize: 12)),
               ),
             ]),
             const SizedBox(height: 12),
-            Text('Prix : ${Formatters.cfa(_priceRange.start)} — ${Formatters.cfa(_priceRange.end)}',
+            Text(strings.tf('filterPrice', [Formatters.cfa(_priceRange.start), Formatters.cfa(_priceRange.end)]),
                 style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
             RangeSlider(
               values: _priceRange,
@@ -92,7 +94,7 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
             ),
             if (widget.allSizes.isNotEmpty) ...[
               const SizedBox(height: 8),
-              const Text('Taille', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
+              Text(strings.size, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
               const SizedBox(height: 8),
               Wrap(spacing: 8, runSpacing: 8, children: widget.allSizes.map((s) {
                 final selected = _sizes.contains(s);
@@ -109,7 +111,7 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
             ],
             if (widget.allColors.isNotEmpty) ...[
               const SizedBox(height: 16),
-              const Text('Couleur', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
+              Text(strings.color, style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 12.5)),
               const SizedBox(height: 8),
               Wrap(spacing: 8, runSpacing: 8, children: widget.allColors.map((c) {
                 final selected = _colors.contains(c);
@@ -137,7 +139,7 @@ class _FilterSheetContentState extends State<_FilterSheetContent> {
                     colors: _colors,
                   ));
                 },
-                child: const Text('Appliquer les filtres'),
+                child: Text(strings.t('filterApply')),
               ),
             ),
           ],

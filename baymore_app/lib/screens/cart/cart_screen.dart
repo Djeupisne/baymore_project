@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_strings.dart';
 import '../../providers/cart_provider.dart';
 import '../../theme/app_colors.dart';
 import '../../utils/formatters.dart';
@@ -17,15 +18,16 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final cart = context.watch<CartProvider>();
+    final strings = AppStrings.of(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Mon panier')),
+      appBar: AppBar(title: Text(strings.t('cartTitle'))),
       body: cart.isEmpty
           ? EmptyState(
               icon: Icons.shopping_bag_outlined,
-              title: 'Votre panier est vide',
-              message: 'Parcourez la boutique et ajoutez vos articles préférés.',
-              actionLabel: 'Continuer mes achats',
+              title: strings.t('cartEmptyTitle'),
+              message: strings.t('cartEmptyMsg'),
+              actionLabel: strings.t('cartContinueShopping'),
               onAction: onContinueShopping ?? () => Navigator.maybePop(context),
             )
           : Column(
@@ -84,17 +86,17 @@ class CartScreen extends StatelessWidget {
                   decoration: const BoxDecoration(color: AppColors.card, border: Border(top: BorderSide(color: AppColors.line))),
                   child: Column(children: [
                     Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-                      const Text('Sous-total', style: TextStyle(fontSize: 12.5, color: AppColors.inkSoft)),
+                      Text(strings.subtotal, style: const TextStyle(fontSize: 12.5, color: AppColors.inkSoft)),
                       Text(Formatters.cfa(cart.subtotal), style: const TextStyle(fontSize: 12.5)),
                     ]),
                     const SizedBox(height: 6),
-                    const Text('Frais de livraison calculés à l\'étape suivante', style: TextStyle(fontSize: 11, color: AppColors.muted)),
+                    Text(strings.t('deliveryFeeNote'), style: const TextStyle(fontSize: 11, color: AppColors.muted)),
                     const SizedBox(height: 14),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CheckoutScreen())),
-                        child: const Text('Passer la commande'),
+                        child: Text(strings.t('placeOrder')),
                       ),
                     ),
                   ]),

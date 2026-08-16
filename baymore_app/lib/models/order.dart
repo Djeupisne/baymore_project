@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+import '../l10n/app_strings.dart';
 import 'order_status.dart';
 
 enum DeliveryMode { domicile, retrait }
@@ -6,6 +8,13 @@ extension DeliveryModeX on DeliveryMode {
   static DeliveryMode fromString(String v) => v == 'RETRAIT' ? DeliveryMode.retrait : DeliveryMode.domicile;
   String get asString => this == DeliveryMode.retrait ? 'RETRAIT' : 'DOMICILE';
   String get label => this == DeliveryMode.retrait ? 'Retrait en boutique' : 'Livraison à domicile';
+
+  /// Libellé traduit selon la langue choisie — à préférer à [label] partout
+  /// où un BuildContext est disponible.
+  String labelFor(BuildContext context) {
+    final s = AppStrings.of(context);
+    return this == DeliveryMode.retrait ? s.t('deliveryPickup') : s.t('deliveryHome');
+  }
 }
 
 class OrderStatusEvent {

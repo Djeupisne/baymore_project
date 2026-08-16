@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import '../../l10n/app_strings.dart';
 import '../../models/product.dart';
 import '../../models/product_filters.dart';
 import '../../services/product_service.dart';
@@ -10,18 +11,29 @@ import '../../widgets/product_filter_sheet.dart';
 import '../product/product_detail_screen.dart';
 
 class SearchScreen extends StatefulWidget {
-  const SearchScreen({super.key});
+  final String? initialQuery;
+  const SearchScreen({super.key, this.initialQuery});
   @override
   State<SearchScreen> createState() => _SearchScreenState();
 }
 
 class _SearchScreenState extends State<SearchScreen> {
-  final _controller = TextEditingController();
+  late final _controller = TextEditingController(text: widget.initialQuery ?? '');
   final _service = ProductService();
   String _query = '';
   ProductFilters _filters = const ProductFilters();
   Future<List<Product>>? _future;
   Timer? _debounce;
+
+  @override
+  void initState() {
+    super.initState();
+    final initial = widget.initialQuery;
+    if (initial != null && initial.trim().isNotEmpty) {
+      _query = initial;
+      _future = _service.search(initial);
+    }
+  }
 
   void _onChanged(String value) {
     setState(() => _query = value);
@@ -45,24 +57,25 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final strings = AppStrings.of(context);
     return Scaffold(
       appBar: AppBar(
         title: TextField(
           controller: _controller,
           autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'Rechercher un article, une marque...',
+          decoration: InputDecoration(
+            hintText: strings.t('searchHint'),
             border: InputBorder.none,
-            prefixIcon: Icon(Icons.search, size: 20),
+            prefixIcon: const Icon(Icons.search, size: 20),
           ),
           onChanged: _onChanged,
         ),
       ),
       body: _future == null
-          ? const EmptyState(
+          ? EmptyState(
               icon: Icons.search,
-              title: 'Que cherchez-vous ?',
-              message: 'Tapez le nom d\'un article, ex. "sac", "derbies", "coffret"...',
+              title: strings.t('searchPromptTitle'),
+              message: strings.t('searchPromptMsg'),
             )
           : FutureBuilder<List<Product>>(
               future: _future,
@@ -75,7 +88,7 @@ class _SearchScreenState extends State<SearchScreen> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
                     child: Row(children: [
-                      Text('${results.length} résultat(s)', style: const TextStyle(fontSize: 12, color: AppColors.muted, fontWeight: FontWeight.w600)),
+                      Text(strings.tf('resultsCount', ['${results.length}']), style: const TextStyle(fontSize: 12, color: AppColors.muted, fontWeight: FontWeight.w600)),
                       const Spacer(),
                       OutlinedButton.icon(
                         onPressed: () async {
@@ -83,7 +96,7 @@ class _SearchScreenState extends State<SearchScreen> {
                           if (updated != null) setState(() => _filters = updated);
                         },
                         icon: const Icon(Icons.tune, size: 16),
-                        label: Text(_filters.isActive ? 'Filtres (${_filters.activeCount})' : 'Filtres'),
+                        label: Text(_filters.isActive ? '${strings.t('filters')} (${_filters.activeCount})' : strings.t('filters')),
                         style: OutlinedButton.styleFrom(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                           side: BorderSide(color: _filters.isActive ? AppColors.ink : AppColors.line),
@@ -96,10 +109,8 @@ class _SearchScreenState extends State<SearchScreen> {
                     child: results.isEmpty
                         ? EmptyState(
                             icon: Icons.search_off,
-                            title: allResults.isEmpty ? 'Aucun résultat pour "$_query"' : 'Aucun résultat avec ces filtres',
-                            message: allResults.isEmpty
-                                ? 'Essayez un autre mot-clé ou parcourez les catégories.'
-                                : 'Essayez d\'élargir vos filtres.',
+                            title: allResults.isEmpty ? strings.tf('noResultsFor', [_query]) : strings.t('noResultsFiltered'),
+                            message: allResults.isEmpty ? strings.t('tryOtherKeyword') : strings.t('tryWiderFilters'),
                           )
                         : GridView.builder(
                             padding: const EdgeInsets.all(20),
