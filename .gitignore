@@ -1,14 +1,18 @@
 ```
-# Dependencies
+# Flutter/Dart specific
 .dart_tool/
 .build/
-dependencies/
+.pub/
+*.iws
+*.swp
+*~
+.DS_Store
+Thumbs.db
 
 # Build outputs
 build/
-*.apk
-*.aab
-*.app
+ios/.generated/
+android/.generated/
 
 # Environment
 .env
@@ -19,17 +23,19 @@ build/
 *.log
 **/logs
 
-# OS generated files
-.DS_Store
-Thumbs.db
+# Dependencies
+node_modules/
+vendor/
 
-# IDE files
-.idea/
+# IDE
 .vscode/
+.idea/
 *.swp
 *.swo
-
-# Temporary files
 *.tmp
-*.temp
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
 ```
