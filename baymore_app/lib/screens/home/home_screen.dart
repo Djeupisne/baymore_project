@@ -10,6 +10,7 @@ import '../product/product_detail_screen.dart';
 import 'category_products_screen.dart';
 import 'search_screen.dart';
 import '../notifications/notifications_screen.dart';
+import '../../services/notification_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -20,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final _productService = ProductService();
   late Future<List<Product>> _future;
+  int _unreadCount = 0;
 
   static const _categories = [
     {'key': 'femme', 'label': 'FEMME', 'color': AppColors.rose, 'icon': Icons.checkroom_outlined},
@@ -42,6 +44,23 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     _future = _productService.fetchAll();
+    NotificationService.addListener(_onNotificationUpdate);
+    _loadUnreadCount();
+  }
+
+  @override
+  void dispose() {
+    NotificationService.removeListener(_onNotificationUpdate);
+    super.dispose();
+  }
+
+  void _onNotificationUpdate() {
+    if (mounted) _loadUnreadCount();
+  }
+
+  Future<void> _loadUnreadCount() async {
+    final count = await NotificationService().unreadCount();
+    if (mounted) setState(() => _unreadCount = count);
   }
 
   Future<void> _refresh() async {
@@ -92,9 +111,36 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SizedBox(width: 8),
                         GestureDetector(
                           onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const NotificationsScreen())),
-                          child: const CircleAvatar(
-                            radius: 18, backgroundColor: Colors.white,
-                            child: Icon(Icons.notifications_none_rounded, color: AppColors.ink, size: 20),
+                          child: Stack(
+                            clipBehavior: Clip.none,
+                            children: [
+                              const CircleAvatar(
+                                radius: 18, backgroundColor: Colors.white,
+                                child: Icon(Icons.notifications_none_rounded, color: AppColors.ink, size: 20),
+                              ),
+                              if (_unreadCount > 0)
+                                Positioned(
+                                  right: -2,
+                                  top: -2,
+                                  child: Container(
+                                    width: 18,
+                                    height: 18,
+                                    decoration: const BoxDecoration(
+                                      color: AppColors.gold,
+                                      shape: BoxShape.circle,
+                                    ),
+                                    alignment: Alignment.center,
+                                    child: Text(
+                                      _unreadCount > 9 ? '9+' : '$_unreadCount',
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
                         ),
                       ]),
