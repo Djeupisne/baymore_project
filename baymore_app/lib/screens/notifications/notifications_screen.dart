@@ -42,8 +42,13 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     await _future;
   }
 
-  Future<void> _markAsRead(String id) async {
+  Future<void> _markAsRead(String id, String title) async {
     await _service.markAsRead(id);
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('${AppStrings.of(context, listen: false).t('notificationMarkedRead')}: $title')),
+      );
+    }
     await _refresh();
   }
 
