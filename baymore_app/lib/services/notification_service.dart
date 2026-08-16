@@ -6,10 +6,12 @@ import '../config/api_config.dart';
 enum NotificationType {
   orderStatus,
   promotion,
+  promoDisabled,
   newProduct,
   restock,
   newOrder,
   message,
+  catalog,
   unknown,
 }
 
@@ -20,6 +22,8 @@ extension NotificationTypeX on NotificationType {
         return NotificationType.orderStatus;
       case 'promotion':
         return NotificationType.promotion;
+      case 'promo_disabled':
+        return NotificationType.promoDisabled;
       case 'new_product':
         return NotificationType.newProduct;
       case 'restock':
@@ -28,6 +32,8 @@ extension NotificationTypeX on NotificationType {
         return NotificationType.newOrder;
       case 'message':
         return NotificationType.message;
+      case 'catalog':
+        return NotificationType.catalog;
       default:
         return NotificationType.unknown;
     }
@@ -130,9 +136,13 @@ class NotificationService {
         // Naviguer vers le suivi de commande
         break;
       case 'promotion':
+      case 'promo_disabled':
       case 'new_product':
       case 'restock':
         // Naviguer vers le détail du produit ou la liste des promotions
+        break;
+      case 'catalog':
+        // Naviguer vers le catalogue
         break;
       default:
         break;
@@ -248,6 +258,77 @@ class NotificationService {
         read: false,
       ));
     }
+    
+    await prefs.setString(_storageKey, jsonEncode(list.map((n) => n.toJson()).toList()));
+    for (final cb in _listeners) {
+      cb();
+    }
+  }
+
+  /// Méthode pour enregistrer une notification de code promo (nouveau ou désactivé)
+  /// Appelée quand l'administrateur crée ou désactive un code promo
+  Future<void> storePromoNotification({
+    required String title,
+    required String body,
+    required NotificationType type,
+    String? promoId,
+    String? promoCode,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = await _readAll(prefs);
+    final id = promoId ?? '${DateTime.now().millisecondsSinceEpoch}';
+    
+    // Vérifier si une notification avec le même promoId existe déjà pour éviter les doublons
+    final existingIndex = list.indexWhere((n) => n.data?['promoId'] == promoId && n.type == type);
+    if (existingIndex != -1) {
+      // Mettre à jour la notification existante
+      list[existingIndex] = AppNotification(
+        id: id,
+        title: title,
+        body: body,
+        receivedAt: DateTime.now(),
+        type: type,
+        data: {'promoId': promoId, 'promoCode': promoCode},
+        read: false,
+      );
+    } else {
+      list.insert(0, AppNotification(
+        id: id,
+        title: title,
+        body: body,
+        receivedAt: DateTime.now(),
+        type: type,
+        data: {'promoId': promoId, 'promoCode': promoCode},
+        read: false,
+      ));
+    }
+    
+    await prefs.setString(_storageKey, jsonEncode(list.map((n) => n.toJson()).toList()));
+    for (final cb in _listeners) {
+      cb();
+    }
+  }
+
+  /// Méthode pour enregistrer une notification de nouveau catalogue
+  /// Appelée quand l'administrateur publie un nouveau catalogue
+  Future<void> storeCatalogNotification({
+    required String title,
+    required String body,
+    String? catalogId,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final list = await _readAll(prefs);
+    final id = catalogId ?? '${DateTime.now().millisecondsSinceEpoch}';
+    
+    list.insert(0, AppNotification(
+      id: id,
+      title: title,
+      body: body,
+      receivedAt: DateTime.now(),
+      type: NotificationType.catalog,
+      data: {'catalogId': catalogId},
+      read: false,
+    ));
     
     await prefs.setString(_storageKey, jsonEncode(list.map((n) => n.toJson()).toList()));
     for (final cb in _listeners) {
