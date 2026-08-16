@@ -30,6 +30,21 @@ router.post('/', requireAuth, requireStaff, async (req, res) => {
       isNew: !!isNew, isPromo: !!isPromo,
     },
   });
+
+  // Notification push pour les nouveautés et promotions
+  if (product.isNew || product.isPromo) {
+    const allCustomers = await prisma.user.findMany({ where: { role: 'CLIENT' }, select: { id: true } });
+    const title = product.isNew ? 'Baymore — Nouveauté' : 'Baymore — Promotion';
+    const body = product.isNew
+      ? `Découvrez "${name}" dans notre nouvelle collection !`
+      : `Profitez de -${((price - (oldPrice || price)) / (oldPrice || price) * 100).toFixed(0)}% sur "${name}" !`;
+    await sendPushToUsers(allCustomers.map((c) => c.id), {
+      title,
+      body,
+      data: { type: product.isNew ? 'new_product' : 'promotion', productId: product.id, isPromo: product.isPromo },
+    });
+  }
+
   res.status(201).json({ product });
 });
 
@@ -54,6 +69,20 @@ router.put('/:id', requireAuth, requireStaff, async (req, res) => {
       });
       await prisma.stockAlert.deleteMany({ where: { productId: product.id } });
     }
+  }
+
+  // Notification pour nouveauté/promotion si le statut change
+  if ((!before?.isNew && isNew) || (!before?.isPromo && isPromo)) {
+    const allCustomers = await prisma.user.findMany({ where: { role: 'CLIENT' }, select: { id: true } });
+    const title = isNew ? 'Baymore — Nouveauté' : 'Baymore — Promotion';
+    const body = isNew
+      ? `Découvrez "${name}" dans notre nouvelle collection !`
+      : `Profitez de -${oldPrice ? Math.round((1 - price / oldPrice) * 100) : 0}% sur "${name}" !`;
+    await sendPushToUsers(allCustomers.map((c) => c.id), {
+      title,
+      body,
+      data: { type: isNew ? 'new_product' : 'promotion', productId: product.id, isPromo },
+    });
   }
 
   res.json({ product });
