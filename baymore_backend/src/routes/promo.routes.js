@@ -53,6 +53,7 @@ router.post('/', requireAuth, requireStaff, async (req, res) => {
   }
   
   const normalizedCode = code.trim().toUpperCase();
+  const normalizedType = type.toUpperCase();
   
   // Vérifier si le code existe déjà
   const existing = await prisma.promoCode.findUnique({ where: { code: normalizedCode } });
@@ -63,7 +64,7 @@ router.post('/', requireAuth, requireStaff, async (req, res) => {
   const promo = await prisma.promoCode.create({
     data: {
       code: normalizedCode,
-      type,
+      type: normalizedType,
       value,
       maxDiscount: maxDiscount ?? null,
       minOrder: minOrder ?? null,
@@ -95,10 +96,11 @@ router.put('/:code', requireAuth, requireStaff, async (req, res) => {
   const { type, value, maxDiscount, minOrder, active, expiresAt, description } = req.body;
   
   const before = await prisma.promoCode.findUnique({ where: { code } });
+  const normalizedType = type ? type.toUpperCase() : undefined;
   const promo = await prisma.promoCode.upsert({
     where: { code },
-    create: { code, type, value, maxDiscount, minOrder, active: active ?? true, expiresAt: expiresAt ? new Date(expiresAt) : null, description },
-    update: { type, value, maxDiscount, minOrder, active, expiresAt: expiresAt ? new Date(expiresAt) : null, description },
+    create: { code, type: normalizedType, value, maxDiscount, minOrder, active: active ?? true, expiresAt: expiresAt ? new Date(expiresAt) : null, description },
+    update: { type: normalizedType, value, maxDiscount, minOrder, active, expiresAt: expiresAt ? new Date(expiresAt) : null, description },
   });
 
   // Notification push quand une nouvelle promotion est créée ou activée
