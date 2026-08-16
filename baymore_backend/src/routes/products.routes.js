@@ -6,12 +6,34 @@ const { sendPushToUsers } = require('../services/onesignal');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-  const { category, search } = req.query;
+  const { category, search, page = '1', limit = '20' } = req.query;
+  const pageNum = parseInt(page, 10);
+  const limitNum = parseInt(limit, 10);
+  const skip = (pageNum - 1) * limitNum;
+  
   const where = {};
   if (category) where.category = category;
   if (search) where.name = { contains: search, mode: 'insensitive' };
-  const products = await prisma.product.findMany({ where, orderBy: { name: 'asc' } });
-  res.json({ products });
+  
+  const [products, total] = await Promise.all([
+    prisma.product.findMany({ 
+      where, 
+      orderBy: { name: 'asc' },
+      skip,
+      take: limitNum
+    }),
+    prisma.product.count({ where })
+  ]);
+  
+  res.json({ 
+    products,
+    pagination: {
+      page: pageNum,
+      limit: limitNum,
+      total,
+      totalPages: Math.ceil(total / limitNum)
+    }
+  });
 });
 
 router.get('/:id', async (req, res) => {

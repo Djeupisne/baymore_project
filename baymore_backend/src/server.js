@@ -21,6 +21,7 @@ const customersRoutes = require('./routes/customers.routes');
 const uploadsRoutes = require('./routes/uploads.routes');
 const walletRoutes = require('./routes/wallet.routes');
 const favoritesRoutes = require('./routes/favorites.routes');
+const loyaltyRoutes = require('./routes/loyalty.routes');
 
 const app = express();
 const server = http.createServer(app);
@@ -65,6 +66,7 @@ app.use('/api/customers', customersRoutes);
 app.use('/api/uploads', uploadsRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/favorites', favoritesRoutes);
+app.use('/api/loyalty', loyaltyRoutes);
 
 // Gestionnaire d'erreurs global — évite qu'une exception non prévue ne
 // fasse planter le serveur silencieusement.

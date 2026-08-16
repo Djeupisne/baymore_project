@@ -6,7 +6,11 @@ const router = express.Router();
 router.use(requireAuth, requireStaff);
 
 router.get('/', async (req, res) => {
-  const { search } = req.query;
+  const { search, page = '1', limit = '20' } = req.query;
+  const pageNum = parseInt(page, 10);
+  const limitNum = parseInt(limit, 10);
+  const skip = (pageNum - 1) * limitNum;
+  
   const where = { role: 'CUSTOMER' };
   if (search) {
     where.OR = [
@@ -15,11 +19,27 @@ router.get('/', async (req, res) => {
       { phone: { contains: search } },
     ];
   }
-  const customers = await prisma.user.findMany({
-    where,
-    select: { id: true, name: true, email: true, phone: true, loyaltyPoints: true, walletBalance: true, createdAt: true },
+  
+  const [customers, total] = await Promise.all([
+    prisma.user.findMany({
+      where,
+      select: { id: true, name: true, email: true, phone: true, loyaltyPoints: true, walletBalance: true, createdAt: true },
+      skip,
+      take: limitNum,
+      orderBy: { createdAt: 'desc' }
+    }),
+    prisma.user.count({ where })
+  ]);
+  
+  res.json({ 
+    customers, 
+    pagination: {
+      page: pageNum,
+      limit: limitNum,
+      total,
+      totalPages: Math.ceil(total / limitNum)
+    }
   });
-  res.json({ customers });
 });
 
 router.get('/:id/orders', async (req, res) => {
