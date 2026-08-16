@@ -12,8 +12,10 @@ class AppStrings {
   final Map<String, String> _values;
   const AppStrings._(this._values);
 
-  static AppStrings of(BuildContext context) {
-    final code = context.watch<LocaleProvider>().locale.languageCode;
+  static AppStrings of(BuildContext context, {bool listen = true}) {
+    final code = listen 
+        ? context.watch<LocaleProvider>().locale.languageCode
+        : context.read<LocaleProvider>().locale.languageCode;
     return AppStrings._(code == 'en' ? _en : _fr);
   }
 

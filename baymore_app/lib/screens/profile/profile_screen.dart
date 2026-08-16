@@ -194,7 +194,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _showContactSupport(BuildContext context) async {
-    final strings = AppStrings.of(context);
+    final strings = AppStrings.of(context, listen: false);
     showModalBottomSheet(
       context: context,
       builder: (context) => Padding(
