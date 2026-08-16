@@ -74,15 +74,7 @@ class AuthProvider extends ChangeNotifier {
     await LocalNotificationService().show(title, body);
     
     // Enregistrer dans l'historique pour le badge et l'écran Notifications
-    await NotificationService()._storeForOrder(status, body, orderId);
-  }
-
-  /// Enregistre une notification de statut de commande dans l'historique
-  /// Méthode interne appelée par _notifyStatusChange
-  Future<void> _storeForOrder(OrderStatus status, String body, String? orderId) async {
-    final service = NotificationService();
-    // Utiliser la méthode interne _store via un wrapper
-    await service._storeFromAuthProvider(
+    await NotificationService().storeOrderStatus(
       title: 'Mise à jour de commande',
       body: body,
       type: NotificationType.orderStatus,
