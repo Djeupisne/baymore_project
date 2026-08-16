@@ -42,6 +42,11 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     await _future;
   }
 
+  Future<void> _markAsRead(String id) async {
+    await _service.markAsRead(id);
+    await _refresh();
+  }
+
   String _getNotificationTitle(AppNotification n, AppStrings strings) {
     switch (n.type) {
       case NotificationType.orderStatus:
@@ -107,6 +112,14 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         title: Text(strings.t('notificationsTitle')),
         actions: [
           IconButton(
+            icon: const Icon(Icons.done_all),
+            tooltip: strings.t('markAllRead'),
+            onPressed: () async {
+              await _service.markAllRead();
+              await _refresh();
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.delete_outline),
             tooltip: strings.t('clearAll'),
             onPressed: () async {
@@ -145,39 +158,59 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                 return Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: n.read ? Colors.white : AppColors.ivory,
                     borderRadius: BorderRadius.circular(14),
-                    border: Border.all(color: AppColors.line),
+                    border: Border.all(color: n.read ? AppColors.line : AppColors.gold.withOpacity(0.3)),
                   ),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 36, height: 36,
-                        decoration: BoxDecoration(
-                          color: iconColor.withOpacity(.1),
-                          shape: BoxShape.circle,
+                  child: InkWell(
+                    onTap: () => _markAsRead(n.id),
+                    borderRadius: BorderRadius.circular(14),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 36, height: 36,
+                          decoration: BoxDecoration(
+                            color: iconColor.withOpacity(.1),
+                            shape: BoxShape.circle,
+                          ),
+                          alignment: Alignment.center,
+                          child: Icon(_getNotificationIcon(n), color: iconColor, size: 18),
                         ),
-                        alignment: Alignment.center,
-                        child: Icon(_getNotificationIcon(n), color: iconColor, size: 18),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              _getNotificationTitle(n, strings),
-                              style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(n.body, style: const TextStyle(fontSize: 12, color: AppColors.muted, height: 1.4)),
-                            const SizedBox(height: 6),
-                            Text(Formatters.shortDate(n.receivedAt), style: const TextStyle(fontSize: 10.5, color: AppColors.muted)),
-                          ],
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      _getNotificationTitle(n, strings),
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w700,
+                                        fontSize: 13,
+                                        color: n.read ? AppColors.ink : AppColors.ink,
+                                      ),
+                                    ),
+                                  ),
+                                  if (!n.read)
+                                    Container(
+                                      width: 8,
+                                      height: 8,
+                                      decoration: const BoxDecoration(color: AppColors.gold, shape: BoxShape.circle),
+                                    ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(n.body, style: TextStyle(fontSize: 12, color: n.read ? AppColors.muted : AppColors.inkSoft, height: 1.4)),
+                              const SizedBox(height: 6),
+                              Text(Formatters.shortDate(n.receivedAt), style: const TextStyle(fontSize: 10.5, color: AppColors.muted)),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 );
               },

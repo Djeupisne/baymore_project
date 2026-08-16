@@ -155,6 +155,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ]),
             _sectionTitle('Aide et assistance'),
             _group([
+              _row(context, Icons.support_agent_outlined, strings.t('contactSupport'), onTap: () => _showContactSupport(context)),
               _row(context, Icons.chat_bubble_outline, strings.contactShop, onTap: () => _openWhatsApp()),
               _row(context, Icons.description_outlined, 'Conditions générales', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TermsScreen()))),
               _row(context, Icons.privacy_tip_outlined, 'Politique de confidentialité', onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const PrivacyScreen()))),
@@ -190,6 +191,46 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<void> _openWhatsApp() async {
     final uri = Uri.parse('https://wa.me/$_whatsappNumber?text=${Uri.encodeComponent("Bonjour Baymore, j'ai une question sur ma commande.")}');
     await launchUrl(uri, mode: LaunchMode.externalApplication);
+  }
+
+  Future<void> _showContactSupport(BuildContext context) async {
+    final strings = AppStrings.of(context);
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(strings.t('contactSupport'), style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16)),
+            const SizedBox(height: 16),
+            _contactTile(Icons.phone_outlined, strings.t('phone'), '+228 90 00 00 00', () => launchUrl(Uri.parse('tel:+22890000000'))),
+            _contactTile(Icons.email_outlined, strings.t('email'), 'support@baymore.com', () => launchUrl(Uri.parse('mailto:support@baymore.com'))),
+            _contactTile(Icons.chat_bubble_outlined, 'WhatsApp', strings.t('chatOnWhatsApp'), () => _openWhatsApp()),
+            _contactTile(Icons.location_on_outlined, strings.t('address'), 'Lomé, Togo', null),
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(color: AppColors.ivory, borderRadius: BorderRadius.circular(12)),
+              child: Text(strings.t('supportHours'), style: const TextStyle(fontSize: 11.5, color: AppColors.muted, height: 1.4)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _contactTile(IconData icon, String label, String value, VoidCallback? onTap) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(icon, color: AppColors.ink, size: 22),
+      title: Text(label, style: const TextStyle(fontSize: 11.5, color: AppColors.muted)),
+      subtitle: Text(value, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w600)),
+      trailing: onTap != null ? const Icon(Icons.arrow_forward_ios, size: 14, color: AppColors.muted) : null,
+      onTap: onTap,
+    );
   }
 
   Widget _stat(String value, String label) {

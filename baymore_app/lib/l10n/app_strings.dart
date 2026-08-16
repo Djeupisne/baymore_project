@@ -319,6 +319,12 @@ class AppStrings {
     'earnPointsReferral': '50 points par parrainage',
     'earnPointsReferralMsg': "Vous et votre filleul recevez chacun 50 points quand il utilise votre code à l'inscription.",
     'loyaltyWalletNote': "Vos points fidélité sont distincts de votre solde portefeuille (cashback) — retrouvez-le dans Profil > Mon portefeuille.",
+    // Conversion points
+    'convertPointsTitle': 'Convertir vos points',
+    'convertPointsSubtitle': 'Transformez vos points fidélité en argent FCFA directement dans votre portefeuille.',
+    'convertPointsBtn': 'Convertir %s points en FCFA',
+    'converting': 'Conversion en cours...',
+    'conversionRate': '1 point = 1 FCFA',
     // Codes promo
     'promoCodesTitle': 'Bons de réduction',
     'noPromoCodes': 'Aucun code actif pour le moment',
@@ -363,6 +369,13 @@ class AppStrings {
     'deleteAccountBody': 'Cette action est définitive : votre profil, vos adresses et vos favoris seront supprimés. Vos commandes passées restent conservées pour la comptabilité de la boutique.',
     'deleteAccountPermanently': 'Supprimer définitivement',
     'deleteAccountError': 'Impossible de supprimer le compte pour le moment. Réessayez plus tard.',
+    // Contact & Support
+    'contactSupport': 'Contact et support',
+    'phone': 'Téléphone',
+    'email': 'E-mail',
+    'chatOnWhatsApp': 'Discuter sur WhatsApp',
+    'address': 'Adresse',
+    'supportHours': 'Lundi - Samedi : 8h00 - 20h00\nDimanche : 14h00 - 18h00',
   };
 
   static const Map<String, String> _en = {
@@ -561,6 +574,12 @@ class AppStrings {
     'earnPointsReferral': '50 points per referral',
     'earnPointsReferralMsg': 'You and your referral each get 50 points when they use your code at sign-up.',
     'loyaltyWalletNote': 'Your loyalty points are separate from your wallet balance (cashback) — find it in Profile > My wallet.',
+    // Conversion points
+    'convertPointsTitle': 'Convert your points',
+    'convertPointsSubtitle': 'Transform your loyalty points into FCFA cash directly in your wallet.',
+    'convertPointsBtn': 'Convert %s points to FCFA',
+    'converting': 'Converting...',
+    'conversionRate': '1 point = 1 FCFA',
     // Promo codes
     'promoCodesTitle': 'Promo codes',
     'noPromoCodes': 'No active codes right now',
@@ -605,5 +624,12 @@ class AppStrings {
     'deleteAccountBody': 'This action is final: your profile, addresses and favorites will be deleted. Your past orders remain kept for the shop\'s accounting records.',
     'deleteAccountPermanently': 'Delete permanently',
     'deleteAccountError': 'Could not delete the account right now. Please try again later.',
+    // Contact & Support
+    'contactSupport': 'Contact and support',
+    'phone': 'Phone',
+    'email': 'Email',
+    'chatOnWhatsApp': 'Chat on WhatsApp',
+    'address': 'Address',
+    'supportHours': 'Monday - Saturday: 8:00 AM - 8:00 PM\\nSunday: 2:00 PM - 6:00 PM',
   };
 }
