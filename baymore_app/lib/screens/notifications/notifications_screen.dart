@@ -39,7 +39,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
 
   Future<void> _refresh() async {
     setState(() => _future = _load());
-    await _future;
+    await _future.then((_) {});
   }
 
   Future<void> _markAsRead(String id, String title) async {
