@@ -53,8 +53,7 @@ router.post('/convert', async (req, res) => {
       data: {
         userId: userId,
         amount: amountToAdd,
-        type: 'CREDIT',
-        description: `Conversion de ${points} points de fidélité en FCFA`
+        reason: `Conversion de ${points} points de fidélité en FCFA`
       }
     });
 
