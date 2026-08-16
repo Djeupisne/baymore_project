@@ -24,10 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (name != null && mounted) {
         print('✅ Login réussi, redirection vers le dashboard');
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (_) => const DashboardScreen()),
-        );
+        Navigator.pushReplacementNamed(context, '/dashboard');
       } else if (mounted) {
         print('❌ Login échoué: nom null');
         setState(() => _error = "Ce compte n'est pas autorisé sur le back-office Baymore.");
