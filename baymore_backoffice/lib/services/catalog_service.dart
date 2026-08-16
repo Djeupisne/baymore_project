@@ -9,7 +9,7 @@ class CatalogService {
     if (active != null) {
       queryParams['active'] = active.toString();
     }
-    final data = await _api.get('/catalogs', queryParams: queryParams.isNotEmpty ? queryParams : null);
+    final data = await _api.get('/catalogs', query: queryParams.isNotEmpty ? queryParams : null);
     return (data['catalogs'] as List).map((c) => Catalog.fromJson(c)).toList();
   }
 
