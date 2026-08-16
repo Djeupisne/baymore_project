@@ -171,9 +171,10 @@ router.patch('/:code/active', requireAuth, requireStaff, async (req, res) => {
     data: { active: req.body.active },
   });
 
+  const allCustomers = await prisma.user.findMany({ where: { role: 'CUSTOMER' }, select: { id: true } });
+
   // Notification quand une promo est réactivée
   if (!before?.active && promo.active) {
-    const allCustomers = await prisma.user.findMany({ where: { role: 'CUSTOMER' }, select: { id: true } });
     await sendPushToUsers(allCustomers.map((c) => c.id), {
       title: 'Baymore — Promotion disponible',
       body: `Le code ${promo.code} est de nouveau actif !`,
@@ -188,6 +189,28 @@ router.patch('/:code/active', requireAuth, requireStaff, async (req, res) => {
           title: 'Baymore — Promotion disponible',
           body: `Le code ${promo.code} est de nouveau actif !`,
           type: 'PROMOTION',
+          data: { code: promo.code, promoId: promo.id },
+        },
+      });
+    }
+  }
+
+  // Notification quand une promo est désactivée
+  if (before?.active && !promo.active) {
+    await sendPushToUsers(allCustomers.map((c) => c.id), {
+      title: 'Baymore — Code promo désactivé',
+      body: `Le code ${promo.code} n'est plus valable.`,
+      data: { type: 'promo_disabled', code: promo.code, promoId: promo.id },
+    });
+
+    // Enregistrer la notification dans l'historique pour chaque client
+    for (const customer of allCustomers) {
+      await prisma.notification.create({
+        data: {
+          userId: customer.id,
+          title: 'Baymore — Code promo désactivé',
+          body: `Le code ${promo.code} n'est plus valable.`,
+          type: 'PROMO_DISABLED',
           data: { code: promo.code, promoId: promo.id },
         },
       });
