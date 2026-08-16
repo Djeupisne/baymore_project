@@ -28,12 +28,8 @@ const catalogsRoutes = require('./routes/catalogs.routes');
 const app = express();
 const server = http.createServer(app);
 
-const io = new Server(server, {
-  cors: { origin: '*' }, // resserrez à votre domaine une fois en production si besoin
-});
-initSocket(io);
-
 // Configuration CORS explicite pour gérer les requêtes cross-origin
+// DOIT être placé AVANT toutes les routes et middlewares
 const corsOptions = {
   origin: true, // Accepte toutes les origines (à restreindre en production)
   methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
@@ -42,6 +38,12 @@ const corsOptions = {
   optionsSuccessStatus: 200,
 };
 app.use(cors(corsOptions));
+
+const io = new Server(server, {
+  cors: { origin: '*' }, // resserrez à votre domaine une fois en production si besoin
+});
+initSocket(io);
+
 app.use(helmet());
 app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 
