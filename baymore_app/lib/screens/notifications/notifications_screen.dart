@@ -52,6 +52,79 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     await _refresh();
   }
 
+  void _openNotificationDetails(AppNotification n) async {
+    // Marquer comme lu d'abord
+    await _service.markAsRead(n.id);
+    
+    // Afficher un message de confirmation
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ouverture des détails de : ${n.title}')),
+      );
+    }
+    
+    // Navigation selon le type de notification
+    switch (n.type) {
+      case NotificationType.message:
+        // Navigation vers la conversation - à implémenter selon votre structure
+        if (mounted) {
+          // TODO: Remplacer par la navigation réelle vers l'écran de conversation
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Navigation vers la conversation...')),
+          );
+        }
+        break;
+      case NotificationType.orderStatus:
+      case NotificationType.newOrder:
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Navigation vers le détail de la commande...')),
+          );
+        }
+        break;
+      case NotificationType.promotion:
+      case NotificationType.newProduct:
+      case NotificationType.restock:
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Navigation vers le produit...')),
+          );
+        }
+        break;
+      default:
+        // Afficher les détails dans un dialog
+        if (mounted) {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text(n.title),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(n.body, style: const TextStyle(fontSize: 14)),
+                  const SizedBox(height: 12),
+                  Text(
+                    'Reçu le : ${Formatters.shortDate(n.receivedAt)}',
+                    style: const TextStyle(fontSize: 12, color: AppColors.muted),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text(AppStrings.of(context).t('close')),
+                ),
+              ],
+            ),
+          );
+        }
+    }
+    
+    // Rafraîchir la liste après traitement
+    await _refresh();
+  }
+
   String _getNotificationTitle(AppNotification n, AppStrings strings) {
     switch (n.type) {
       case NotificationType.orderStatus:
@@ -168,7 +241,7 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
                     border: Border.all(color: n.read ? AppColors.line : AppColors.gold.withOpacity(0.3)),
                   ),
                   child: InkWell(
-                    onTap: () => _markAsRead(n.id),
+                    onTap: () => _openNotificationDetails(n),
                     borderRadius: BorderRadius.circular(14),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,

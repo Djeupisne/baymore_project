@@ -1,25 +1,14 @@
-```
-# Build artifacts
-*.dart_tool/
-*.build/
-build/
-
 # Dependencies
-.pub/
 .dart_tool/
-**/node_modules/
-
+.build/
 # Logs and temp files
 *.log
 *.tmp
-
+*.swp
 # Environment
 .env
 .env.local
 *.env.*
-
 # Editors
-.idea/
 .vscode/
-*.swp
-```
+.idea/
