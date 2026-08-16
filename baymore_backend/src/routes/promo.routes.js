@@ -45,6 +45,46 @@ router.get('/active', requireAuth, async (req, res) => {
 
 // ---- Réservé au staff ----
 
+router.post('/', requireAuth, requireStaff, async (req, res) => {
+  const { code, type, value, maxDiscount, minOrder, active, expiresAt, description } = req.body;
+  
+  if (!code || !type || value === undefined) {
+    return res.status(400).json({ error: 'Les champs code, type et value sont obligatoires.' });
+  }
+  
+  const normalizedCode = code.trim().toUpperCase();
+  
+  // Vérifier si le code existe déjà
+  const existing = await prisma.promoCode.findUnique({ where: { code: normalizedCode } });
+  if (existing) {
+    return res.status(409).json({ error: `Le code promo "${normalizedCode}" existe déjà.` });
+  }
+  
+  const promo = await prisma.promoCode.create({
+    data: {
+      code: normalizedCode,
+      type,
+      value,
+      maxDiscount: maxDiscount ?? null,
+      minOrder: minOrder ?? null,
+      active: active ?? true,
+      expiresAt: expiresAt ? new Date(expiresAt) : null,
+      description: description ?? null,
+    },
+  });
+
+  // Notification push quand une nouvelle promotion est créée
+  const allCustomers = await prisma.user.findMany({ where: { role: 'CLIENT' }, select: { id: true } });
+  const promoLabel = type === 'PERCENT' ? `-${value}%` : `-${value} F CFA`;
+  await sendPushToUsers(allCustomers.map((c) => c.id), {
+    title: 'Baymore — Nouvelle Promotion',
+    body: `Profitez de ${promoLabel} avec le code ${normalizedCode} !${description ? ' ' + description : ''}`,
+    data: { type: 'promotion', code: normalizedCode, promoId: promo.id },
+  });
+
+  res.json({ promo });
+});
+
 router.get('/', requireAuth, requireStaff, async (req, res) => {
   const codes = await prisma.promoCode.findMany({ orderBy: { createdAt: 'desc' } });
   res.json({ codes });

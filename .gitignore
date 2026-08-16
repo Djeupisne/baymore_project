@@ -1,41 +1,25 @@
 ```
-# Flutter/Dart specific
+# Dependencies
+node_modules/
+.pub-cache/
 .dart_tool/
-.build/
-.pub/
-*.iws
-*.swp
-*~
-.DS_Store
-Thumbs.db
-
-# Build outputs
 build/
-ios/.generated/
-android/.generated/
+
+# Logs and temp files
+*.log
+*.tmp
+*.swp
 
 # Environment
 .env
 .env.local
 *.env.*
 
-# Logs
-*.log
-**/logs
-
-# Dependencies
-node_modules/
-vendor/
-
-# IDE
+# Editors
 .vscode/
 .idea/
-*.swp
-*.swo
-*.tmp
 
-# Coverage
-coverage/
-htmlcov/
-.coverage
+# OS generated files
+.DS_Store
+Thumbs.db
 ```

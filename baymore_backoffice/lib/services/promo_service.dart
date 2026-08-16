@@ -19,7 +19,7 @@ class PromoCodeService {
       // Modification - PUT
       await _api.put('/promo/${promo.code.trim().toUpperCase()}', data: promo.toJson());
     } else {
-      // Création - POST
+      // Création - POST avec tous les champs nécessaires
       await _api.post('/promo', data: promo.toJson());
     }
   }
