@@ -4,6 +4,7 @@ import 'products_screen.dart';
 import 'promo_codes_screen.dart';
 import 'returns_screen.dart';
 import 'reviews_screen.dart';
+import 'contact_screen.dart';
 
 class MoreScreen extends StatelessWidget {
   const MoreScreen({super.key});
@@ -17,7 +18,26 @@ class MoreScreen extends StatelessWidget {
         _tile(context, Icons.confirmation_number_outlined, 'Codes promo', 'Créer et gérer vos offres', const PromoCodesScreen()),
         _tile(context, Icons.assignment_return_outlined, 'Retours & remboursements', 'Traiter les demandes des clients', const ReturnsScreen()),
         _tile(context, Icons.reviews_outlined, 'Avis clients', 'Modérer les avis publiés', const ReviewsScreen()),
+        const SizedBox(height: 8),
+        _sectionTitle('Support'),
+        const SizedBox(height: 8),
+        _tile(context, Icons.support_agent_outlined, 'Contact & Support', 'Contacter l\'équipe technique', const ContactScreen()),
       ],
+    );
+  }
+
+  Widget _sectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 12, bottom: 8),
+      child: Text(
+        title,
+        style: const TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          color: AppColors.muted,
+          letterSpacing: 0.5,
+        ),
+      ),
     );
   }
 
