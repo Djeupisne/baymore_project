@@ -85,8 +85,35 @@ router.patch('/:id/cancel', requireAuth, async (req, res) => {
 // ---- Réservé au staff ----
 
 router.get('/', requireAuth, requireStaff, async (req, res) => {
-  const orders = await prisma.order.findMany({ orderBy: { createdAt: 'desc' } });
-  res.json({ orders });
+  const { page = '1', limit = '20', status } = req.query;
+  const pageNum = parseInt(page, 10);
+  const limitNum = parseInt(limit, 10);
+  const skip = (pageNum - 1) * limitNum;
+  
+  const where = {};
+  if (status) {
+    where.status = status;
+  }
+  
+  const [orders, total] = await Promise.all([
+    prisma.order.findMany({ 
+      where,
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limitNum
+    }),
+    prisma.order.count({ where })
+  ]);
+  
+  res.json({ 
+    orders,
+    pagination: {
+      page: pageNum,
+      limit: limitNum,
+      total,
+      totalPages: Math.ceil(total / limitNum)
+    }
+  });
 });
 
 router.patch('/:id/status', requireAuth, requireStaff, async (req, res) => {

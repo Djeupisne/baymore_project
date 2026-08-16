@@ -87,8 +87,29 @@ router.post('/', requireAuth, requireStaff, async (req, res) => {
 });
 
 router.get('/', requireAuth, requireStaff, async (req, res) => {
-  const codes = await prisma.promoCode.findMany({ orderBy: { createdAt: 'desc' } });
-  res.json({ codes });
+  const { page = '1', limit = '20' } = req.query;
+  const pageNum = parseInt(page, 10);
+  const limitNum = parseInt(limit, 10);
+  const skip = (pageNum - 1) * limitNum;
+  
+  const [codes, total] = await Promise.all([
+    prisma.promoCode.findMany({ 
+      orderBy: { createdAt: 'desc' },
+      skip,
+      take: limitNum
+    }),
+    prisma.promoCode.count({})
+  ]);
+  
+  res.json({ 
+    codes,
+    pagination: {
+      page: pageNum,
+      limit: limitNum,
+      total,
+      totalPages: Math.ceil(total / limitNum)
+    }
+  });
 });
 
 router.put('/:code', requireAuth, requireStaff, async (req, res) => {
