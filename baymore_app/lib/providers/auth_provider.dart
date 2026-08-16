@@ -50,24 +50,8 @@ class AuthProvider extends ChangeNotifier {
     // Rejoindre la room des clients pour recevoir les notifications de promos et catalogues
     SocketService().joinCustomerRoom();
     
-    SocketService().socket.on('order:update', (data) {
-      try {
-        final map = Map<String, dynamic>.from(data);
-        if (map['userId'] != _profile?.uid) return;
-        final statusStr = map['status'] as String?;
-        if (statusStr == null) return;
-
-        final orderId = map['id'] as String?;
-        _notifyStatusChange(statusStr, orderId);
-
-        if (statusStr == 'LIVRE') {
-          refreshProfile();
-        }
-      } catch (_) {}
-    });
-
-    // Écouter les notifications de codes promo (création, activation, désactivation)
-    SocketService().socket.on('promo:notification', (data) {
+    // Configurer les écouteurs de notifications en temps réel
+    SocketService().onPromoNotification((data) {
       try {
         final map = Map<String, dynamic>.from(data);
         final type = map['type'] as String?;
@@ -105,7 +89,7 @@ class AuthProvider extends ChangeNotifier {
     });
 
     // Écouter les notifications de nouveaux catalogues
-    SocketService().socket.on('catalog:notification', (data) {
+    SocketService().onCatalogNotification((data) {
       try {
         final map = Map<String, dynamic>.from(data);
         final title = map['title'] as String? ?? 'Baymore';
@@ -123,6 +107,22 @@ class AuthProvider extends ChangeNotifier {
           body: body,
           catalogId: catalogId,
         );
+      } catch (_) {}
+    });
+    
+    SocketService().socket.on('order:update', (data) {
+      try {
+        final map = Map<String, dynamic>.from(data);
+        if (map['userId'] != _profile?.uid) return;
+        final statusStr = map['status'] as String?;
+        if (statusStr == null) return;
+
+        final orderId = map['id'] as String?;
+        _notifyStatusChange(statusStr, orderId);
+
+        if (statusStr == 'LIVRE') {
+          refreshProfile();
+        }
       } catch (_) {}
     });
   }

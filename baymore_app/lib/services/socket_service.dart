@@ -29,11 +29,13 @@ class SocketService {
   
   /// Écouter les notifications de promotions/codes promo
   void onPromoNotification(void Function(Map<String, dynamic>) callback) {
+    socket.off('promo:notification'); // Supprimer d'éventuels anciens listeners
     socket.on('promo:notification', (data) => callback(data));
   }
   
   /// Écouter les notifications de nouveaux catalogues
   void onCatalogNotification(void Function(Map<String, dynamic>) callback) {
+    socket.off('catalog:notification'); // Supprimer d'éventuels anciens listeners
     socket.on('catalog:notification', (data) => callback(data));
   }
   

@@ -1,42 +1,28 @@
 ```
 # Dependencies
-node_modules/
-vendor/
-
-# Build outputs
-build/
-dist/
-*.min.js
-*.min.css
-*.bundle.js
-
-# Logs
+.dart_tool/
+.build/
+# Logs and temp files
 *.log
-logs/
-
+*.tmp
+*.swp
 # Environment
 .env
 .env.local
-.env.*
-
-# IDE
-.vscode/
+*.env.*
+# Editors
 .idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
 *.swp
 *.swo
-
-# OS
+# OS generated files
 .DS_Store
 Thumbs.db
-
-# Dart/Flutter specific
-.dart_tool/
-.packages
-.pub/
-build/
-*.g.dart
-*.freezed.dart
-
+# Coverage reports
+coverage/
 # Temporary files
 *.tmp
 *.temp
