@@ -2,6 +2,7 @@ const express = require('express');
 const prisma = require('../lib/prisma');
 const { requireAuth, requireStaff } = require('../middleware/auth');
 const { sendPushToUsers } = require('../services/onesignal');
+const { emitPromoNotification, emitPromoDisabledNotification } = require('../lib/socket');
 
 const router = express.Router();
 
@@ -83,6 +84,15 @@ router.post('/', requireAuth, requireStaff, async (req, res) => {
     data: { type: 'promotion', code: normalizedCode, promoId: promo.id },
   });
 
+  // Émettre l'événement Socket.io pour les clients connectés
+  emitPromoNotification({
+    type: 'promotion',
+    title: 'Baymore — Nouvelle Promotion',
+    body: `Profitez de ${promoLabel} avec le code ${normalizedCode} !${description ? ' ' + description : ''}`,
+    promoId: promo.id,
+    promoCode: normalizedCode,
+  });
+
   // Enregistrer la notification dans l'historique pour chaque client
   for (const customer of allCustomers) {
     await prisma.notification.create({
@@ -147,6 +157,15 @@ router.put('/:code', requireAuth, requireStaff, async (req, res) => {
       data: { type: 'promotion', code, promoId: promo.id },
     });
 
+    // Émettre l'événement Socket.io pour les clients connectés
+    emitPromoNotification({
+      type: 'promotion',
+      title: 'Baymore — Nouvelle Promotion',
+      body: `Profitez de ${promoLabel} avec le code ${code} !${description ? ' ' + description : ''}`,
+      promoId: promo.id,
+      promoCode: code,
+    });
+
     // Enregistrer la notification dans l'historique pour chaque client
     for (const customer of allCustomers) {
       await prisma.notification.create({
@@ -181,6 +200,15 @@ router.patch('/:code/active', requireAuth, requireStaff, async (req, res) => {
       data: { type: 'promotion', code: promo.code, promoId: promo.id },
     });
 
+    // Émettre l'événement Socket.io pour les clients connectés
+    emitPromoNotification({
+      type: 'promotion',
+      title: 'Baymore — Promotion disponible',
+      body: `Le code ${promo.code} est de nouveau actif !`,
+      promoId: promo.id,
+      promoCode: promo.code,
+    });
+
     // Enregistrer la notification dans l'historique pour chaque client
     for (const customer of allCustomers) {
       await prisma.notification.create({
@@ -201,6 +229,15 @@ router.patch('/:code/active', requireAuth, requireStaff, async (req, res) => {
       title: 'Baymore — Code promo désactivé',
       body: `Le code ${promo.code} n'est plus valable.`,
       data: { type: 'promo_disabled', code: promo.code, promoId: promo.id },
+    });
+
+    // Émettre l'événement Socket.io pour les clients connectés
+    emitPromoDisabledNotification({
+      type: 'promo_disabled',
+      title: 'Baymore — Code promo désactivé',
+      body: `Le code ${promo.code} n'est plus valable.`,
+      promoId: promo.id,
+      promoCode: promo.code,
     });
 
     // Enregistrer la notification dans l'historique pour chaque client

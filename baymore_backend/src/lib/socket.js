@@ -17,6 +17,14 @@ function initSocket(io) {
     socket.on('staff:join', () => {
       socket.join('staff');
     });
+    // Les clients rejoignent une room globale pour recevoir les notifications
+    // de promotions, codes promo et catalogues
+    socket.on('customer:join', () => {
+      socket.join('customers');
+    });
+    socket.on('customer:leave', () => {
+      socket.leave('customers');
+    });
   });
 }
 
@@ -35,4 +43,27 @@ function emitNewOrderToStaff(order) {
   getIo().to('staff').emit('order:new', order);
 }
 
-module.exports = { initSocket, getIo, emitOrderUpdate, emitNewOrderToStaff };
+/** Émet une notification pour un nouveau code promo ou activation */
+function emitPromoNotification(data) {
+  getIo().to('customers').emit('promo:notification', data);
+}
+
+/** Émet une notification pour un code promo désactivé */
+function emitPromoDisabledNotification(data) {
+  getIo().to('customers').emit('promo:notification', data);
+}
+
+/** Émet une notification pour un nouveau catalogue */
+function emitCatalogNotification(data) {
+  getIo().to('customers').emit('catalog:notification', data);
+}
+
+module.exports = { 
+  initSocket, 
+  getIo, 
+  emitOrderUpdate, 
+  emitNewOrderToStaff,
+  emitPromoNotification,
+  emitPromoDisabledNotification,
+  emitCatalogNotification
+};

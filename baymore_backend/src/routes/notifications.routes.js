@@ -2,6 +2,7 @@ const express = require('express');
 const prisma = require('../lib/prisma');
 const { requireAuth, requireStaff } = require('../middleware/auth');
 const { sendPushToUsers } = require('../services/onesignal');
+const { emitCatalogNotification, emitPromoNotification, emitPromoDisabledNotification } = require('../lib/socket');
 
 const router = express.Router();
 
@@ -25,6 +26,13 @@ router.post('/catalog', requireAuth, requireStaff, async (req, res) => {
       title,
       body,
       data: { type: 'catalog', catalogId },
+    });
+
+    // Émettre l'événement Socket.io pour les clients connectés
+    emitCatalogNotification({
+      title,
+      body,
+      catalogId,
     });
 
     // Enregistrer la notification dans l'historique pour chaque client
@@ -66,6 +74,16 @@ router.post('/promo', requireAuth, requireStaff, async (req, res) => {
       data: { type: type || 'promotion', promoId, promoCode },
     });
 
+    // Émettre l'événement Socket.io pour les clients connectés
+    const eventType = type === 'promo_disabled' ? emitPromoDisabledNotification : emitPromoNotification;
+    eventType({
+      type: type || 'promotion',
+      title,
+      body,
+      promoId,
+      promoCode,
+    });
+
     // Enregistrer la notification dans l'historique pour chaque client
     for (const customer of allCustomers) {
       await prisma.notification.create({
@@ -103,6 +121,15 @@ router.post('/promo-disabled', requireAuth, requireStaff, async (req, res) => {
       title,
       body,
       data: { type: 'promo_disabled', promoId, promoCode },
+    });
+
+    // Émettre l'événement Socket.io pour les clients connectés
+    emitPromoDisabledNotification({
+      type: 'promo_disabled',
+      title,
+      body,
+      promoId,
+      promoCode,
     });
 
     // Enregistrer la notification dans l'historique pour chaque client
