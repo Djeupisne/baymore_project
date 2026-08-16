@@ -83,6 +83,19 @@ router.post('/', requireAuth, requireStaff, async (req, res) => {
     data: { type: 'promotion', code: normalizedCode, promoId: promo.id },
   });
 
+  // Enregistrer la notification dans l'historique pour chaque client
+  for (const customer of allCustomers) {
+    await prisma.notification.create({
+      data: {
+        userId: customer.id,
+        title: 'Baymore — Nouvelle Promotion',
+        body: `Profitez de ${promoLabel} avec le code ${normalizedCode} !${description ? ' ' + description : ''}`,
+        type: 'PROMOTION',
+        data: { code: normalizedCode, promoId: promo.id },
+      },
+    });
+  }
+
   res.json({ promo });
 });
 
@@ -133,6 +146,19 @@ router.put('/:code', requireAuth, requireStaff, async (req, res) => {
       body: `Profitez de ${promoLabel} avec le code ${code} !${description ? ' ' + description : ''}`,
       data: { type: 'promotion', code, promoId: promo.id },
     });
+
+    // Enregistrer la notification dans l'historique pour chaque client
+    for (const customer of allCustomers) {
+      await prisma.notification.create({
+        data: {
+          userId: customer.id,
+          title: 'Baymore — Nouvelle Promotion',
+          body: `Profitez de ${promoLabel} avec le code ${code} !${description ? ' ' + description : ''}`,
+          type: 'PROMOTION',
+          data: { code, promoId: promo.id },
+        },
+      });
+    }
   }
 
   res.json({ promo });
@@ -153,6 +179,19 @@ router.patch('/:code/active', requireAuth, requireStaff, async (req, res) => {
       body: `Le code ${promo.code} est de nouveau actif !`,
       data: { type: 'promotion', code: promo.code, promoId: promo.id },
     });
+
+    // Enregistrer la notification dans l'historique pour chaque client
+    for (const customer of allCustomers) {
+      await prisma.notification.create({
+        data: {
+          userId: customer.id,
+          title: 'Baymore — Promotion disponible',
+          body: `Le code ${promo.code} est de nouveau actif !`,
+          type: 'PROMOTION',
+          data: { code: promo.code, promoId: promo.id },
+        },
+      });
+    }
   }
 
   res.json({ promo });

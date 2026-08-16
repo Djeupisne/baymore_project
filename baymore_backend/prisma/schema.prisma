@@ -69,6 +69,7 @@ model User {
   returnRequests     ReturnRequest[]
   stockAlerts        StockAlert[]
   walletTransactions WalletTransaction[]
+  notifications      Notification[]
 }
 
 model Address {
@@ -196,4 +197,19 @@ model WalletTransaction {
   createdAt DateTime @default(now())
 
   @@index([userId])
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title     String
+  body      String
+  type      String   // PROMOTION, NEW_PRODUCT, ORDER_STATUS, etc.
+  data      Json?    @default("{}")
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([userId])
+  @@index([read])
 }
