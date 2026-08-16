@@ -1,1 +1,32 @@
-Nothing should be ignored based on the provided file changes. The only modified file is a JavaScript route file (`baymore_backend/src/routes/promo.routes.js`), which is source code and should not be ignored. No build artifacts, dependencies, or temporary files are present in the changes.
+```
+# Flutter/Dart specific
+.dart_tool/
+.packages
+pubspec.lock
+
+# Build outputs
+build/
+**/ios/Flutter/.last_build_id
+
+# IDE files
+.vscode/
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Environment variables
+.env
+.env.local
+*.env.*
+
+# Log files
+*.log
+*.tmp
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+```
