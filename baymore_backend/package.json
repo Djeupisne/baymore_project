@@ -10,7 +10,7 @@
     "prisma:migrate": "prisma migrate deploy",
     "prisma:migrate:dev": "prisma migrate dev",
     "prisma:studio": "prisma studio",
-    "postinstall": "prisma generate && prisma migrate deploy"
+    "postinstall": "prisma generate && (prisma migrate deploy || prisma migrate resolve --applied \"20250816164946_init\")"
   },
   "dependencies": {
     "@prisma/client": "^6.19.3",
