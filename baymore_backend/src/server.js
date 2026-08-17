@@ -44,6 +44,10 @@ const io = new Server(server, {
 });
 initSocket(io);
 
+// Configuration du trust proxy pour les déploiements derrière un reverse proxy (Render, etc.)
+// Nécessaire pour que express-rate-limit identifie correctement les IP via X-Forwarded-For
+app.set('trust proxy', true);
+
 app.use(helmet());
 app.use(morgan(env.nodeEnv === 'production' ? 'combined' : 'dev'));
 
